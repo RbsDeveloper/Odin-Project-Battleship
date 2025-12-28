@@ -14,3 +14,10 @@ test("Test if ship can get hit", () => {
     ship.hit();
     expect(ship.hits).toBe(1);
 })
+
+test("Test if ship can sunk",  () => {
+    ship.hit();
+    ship.hit();
+    ship.hit();
+    expect(ship.isSunk).toBe(true);
+})
