@@ -1,3 +1,4 @@
+import { Gameboard } from "../src/Gameboard.js";
 
 let gameBoard;
 
