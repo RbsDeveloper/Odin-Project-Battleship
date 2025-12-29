@@ -24,8 +24,28 @@ describe("Gameboard creation", () => {
 
 describe("Placing ships", () => {
     test("Placing 1 lengthed ship", () => {
-        const firstShip = Ship(1);
+        const firstShip = new Ship(1);
         gameBoard.placeShip(firstShip, [4,4])
-        expect(gameBoard.grid[4][4]).toEqual({occupied: true})
+        expect(gameBoard.grid[4][4]).toEqual({
+            occupied: true,
+            shipReference: firstShip,
+        })
+    })
+
+    test("Placing a ship with a larger length", () => {
+        const largerShip = new Ship(3);
+        gameBoard.placeShip(largerShip, [5,5]);
+        expect(gameBoard.grid[5][5]).toEqual({
+            occupied: true,
+            shipReference: largerShip,
+        })
+        expect(gameBoard.grid[5][6]).toEqual({
+            occupied: true,
+            shipReference: largerShip,
+        })
+        expect(gameBoard.grid[5][7]).toEqual({
+            occupied: true,
+            shipReference: largerShip,
+        })
     })
 })
