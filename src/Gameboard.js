@@ -9,9 +9,14 @@ export function Gameboard () {
         }
 
         const totalCellOccupied = ship.length
+        const lastCellOfShip = col + (totalCellOccupied - 1);
 
-        for(let i = col; i < col+totalCellOccupied; i++){
+        if( lastCellOfShip > 9){
+            throw new Error("Ship can't be placed out of the grid")
+        }else{
+            for(let i = col; i < col+totalCellOccupied; i++){
             grid[row][i] = cellStateObject;
+            }
         }
 
     }
