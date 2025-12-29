@@ -1,5 +1,5 @@
 import { Gameboard } from "../src/Gameboard.js";
-
+import { Ship } from "../src/Ship.js";
 let gameBoard;
 
 beforeEach(()=> {
@@ -19,5 +19,13 @@ describe("Gameboard creation", () => {
         gameBoard.grid.forEach(row => {
             row.forEach(cell => expect(cell).toBeNull())
         })
+    })
+})
+
+describe("Placing ships", () => {
+    test("Placing 1 lengthed ship", () => {
+        const firstShip = Ship(1);
+        gameBoard.placeShip(firstShip, [4,4])
+        expect(gameBoard.grid[4][4]).toEqual({occupied: true})
     })
 })
