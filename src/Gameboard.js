@@ -10,13 +10,6 @@ export function Gameboard () {
 
         const totalCellOccupied = ship.length
 
-        /*
-            we need to grab the length of the ship
-            we have to loop starting from the firs col 
-            for each cell we need to set it equal to the cellStateObject
-
-        */
-
         for(let i = col; i < col+totalCellOccupied; i++){
             grid[row][i] = cellStateObject;
         }

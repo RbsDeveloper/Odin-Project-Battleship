@@ -48,4 +48,9 @@ describe("Placing ships", () => {
             shipReference: largerShip,
         })
     })
+
+    test("Place a ship that go outside the board", () => {
+        const largeShip = new Ship(5);
+        expect(() => gameBoard.placeShip(largeShip, [5,5])).toThrow("ship can't be placed out of the grid")
+    })
 })
