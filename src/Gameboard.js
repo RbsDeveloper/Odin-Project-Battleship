@@ -14,9 +14,21 @@ export function Gameboard () {
         if( lastCellOfShip > 9){
             throw new Error("Ship can't be placed out of the grid")
         }else{
+
+            let areCellsFree = true;
+            
             for(let i = col; i < col+totalCellOccupied; i++){
-            grid[row][i] = cellStateObject;
+                if(grid[row][i] !== null){
+                    areCellsFree = false;
+                    throw new Error("Ship can't be placed: overlapping ship")
+                }
             }
+
+            
+            for(let i = col; i < col+totalCellOccupied; i++){
+                grid[row][i] = cellStateObject;
+            }   
+            
         }
 
     }
