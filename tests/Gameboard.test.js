@@ -53,4 +53,13 @@ describe("Placing ships", () => {
         const largeShip = new Ship(5);
         expect(() => gameBoard.placeShip(largeShip, [5,6])).toThrow("Ship can't be placed out of the grid")
     })
+
+    test("Place a ship that overlaps", () => {
+        const largerShip = new Ship(5);
+        const smallShip = new Ship(3);
+        expect(() => {
+            gameBoard.placeShip(largerShip, [5,4])
+            gameBoard.placeShip(smallShip, [5,2])
+        }).toThrow("Ship can't be placed: overlapping ship")
+    })
 })
