@@ -25,7 +25,7 @@ describe("Gameboard creation", () => {
 describe("Placing ships", () => {
     test("Placing 1 lengthed ship", () => {
         const firstShip = new Ship(1);
-        gameBoard.placeShip(firstShip, [4,4])
+        gameBoard.placeShip(firstShip, "horizontal", [4,4])
         expect(gameBoard.grid[4][4]).toEqual({
             occupied: true,
             shipReference: firstShip,
@@ -34,7 +34,7 @@ describe("Placing ships", () => {
 
     test("Placing a ship with a larger length", () => {
         const largerShip = new Ship(3);
-        gameBoard.placeShip(largerShip, [5,5]);
+        gameBoard.placeShip(largerShip, "horizontal", [5,5]);
         expect(gameBoard.grid[5][5]).toEqual({
             occupied: true,
             shipReference: largerShip,
@@ -51,15 +51,32 @@ describe("Placing ships", () => {
 
     test("Place a ship that go outside the board", () => {
         const largeShip = new Ship(5);
-        expect(() => gameBoard.placeShip(largeShip, [5,6])).toThrow("Ship can't be placed out of the grid")
+        expect(() => gameBoard.placeShip(largeShip, "horizontal", [5,6])).toThrow("Ship can't be placed out of the grid")
     })
 
     test("Place a ship that overlaps", () => {
         const largerShip = new Ship(5);
         const smallShip = new Ship(3);
         expect(() => {
-            gameBoard.placeShip(largerShip, [5,4])
-            gameBoard.placeShip(smallShip, [5,2])
+            gameBoard.placeShip(largerShip, "horizontal", [5,4])
+            gameBoard.placeShip(smallShip, "horizontal", [5,2])
         }).toThrow("Ship can't be placed: overlapping ship")
+    })
+
+    test("Choose a direction for the ship placement", () => {
+        const verticalShip = new Ship(3);
+        gameBoard.placeShip(verticalShip, "vertical", [0,3]);
+        expect(gameBoard.grid[0][3]).toEqual({
+            occupied: true,
+            shipReference: verticalShip,
+        });
+        expect(gameBoard.grid[1][3]).toEqual({
+            occupied: true,
+            shipReference: verticalShip,
+        });
+        expect(gameBoard.grid[2][3]).toEqual({
+            occupied: true,
+            shipReference: verticalShip,
+        })
     })
 })
