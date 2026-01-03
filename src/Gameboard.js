@@ -20,8 +20,12 @@ export function Gameboard () {
 
         occupyCell(grid, coordsForShipPlacement, cellStateObject);
     }
+
+    const receiveAttack = ([row, col]) => {
+        if(grid[row][col] !== null) return true;
+    }
     
-    return { grid, placeShip }
+    return { grid, placeShip, receiveAttack }
 }
 
 const isOutOfBounds = (shipObj, cellType) => {
