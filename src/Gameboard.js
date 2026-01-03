@@ -9,41 +9,58 @@ export function Gameboard () {
         }
 
         const cellType = direction === "vertical" ? row : col;
-        const totalCellOccupied = ship.length
-        const lastCellOfShip = cellType + (totalCellOccupied - 1);
-
-        if( lastCellOfShip > 9) throw new Error("Ship can't be placed out of the grid")
         
-        if(direction === 'vertical'){
-            for(let i = cellType; i < cellType + totalCellOccupied; i++){
-            
-                if(grid[i][col] !== null){
-                    throw new Error("Ship can't be placed: overlapping ship")
-                }
-            }
-        }else{
-            for(let i = cellType; i < cellType + totalCellOccupied; i++){
-                if(grid[row][i] !== null){
-                    throw new Error("Ship can't be placed: overlapping ship")
-                }
-            }
+        isOutOfBounds(ship, cellType);
+
+        const coordsForShipPlacement = getCellsForPlacement(ship, direction, [row, col]);
+
+        if(!canBePlaced(grid, coordsForShipPlacement)){
+            throw new Error("Ship can't be placed: overlapping ship")
         }
-         
-        if(direction === 'vertical'){
-            for(let i = cellType; i < cellType + totalCellOccupied; i++){
-                grid[i][col] = cellStateObject;
-            }
-            
-        }else{
-            for(let i = cellType; i < cellType + totalCellOccupied; i++){
-                grid[row][i] = cellStateObject;
-            }
-        }
-      
+
+        occupyCell(grid, coordsForShipPlacement, cellStateObject);
     }
     
     return { grid, placeShip }
 }
 
+const isOutOfBounds = (shipObj, cellType) => {
+    const totalCellOccupied = shipObj.length
+    const lastCellOfShip = cellType + (totalCellOccupied - 1);
+
+    if( lastCellOfShip > 9) throw new Error("Ship can't be placed out of the grid")
+}
+
+const getCellsForPlacement = (shipObj, direction, [rowCoords, colCoords]) => {
+
+    let cellsForPlacement = [];
+
+    if(direction === 'vertical'){
+        for(let i = rowCoords; i < rowCoords + shipObj.length; i++){
+            cellsForPlacement.push([i, colCoords])
+        }
+    }else{
+        for(let i = colCoords; i < colCoords + shipObj.length; i++){
+            cellsForPlacement.push([rowCoords, i])
+        }
+    }
+    
+    return cellsForPlacement
+}
+
+const canBePlaced = (gameBoard, shipCoords) => {
+    for(let i = 0; i < shipCoords.length; i++){
+        if(gameBoard[shipCoords[i][0]][shipCoords[i][1]] !== null){
+            return false
+        }
+    }
+    return true
+}
+
+const occupyCell = (gameBoard, shipCoords, objToPlace) => {
+    for(let i = 0; i < shipCoords.length; i++){
+        gameBoard[shipCoords[i][0]][shipCoords[i][1]] = objToPlace;
+    }
+}
 
 
