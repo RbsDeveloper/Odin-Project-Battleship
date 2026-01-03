@@ -22,7 +22,12 @@ export function Gameboard () {
     }
 
     const receiveAttack = ([row, col]) => {
-        if(grid[row][col] !== null) return true;
+        if(grid[row][col] !== null){
+            grid[row][col].shipReference.hit();
+            return true;
+        }else{
+            return false;
+        }
     }
     
     return { grid, placeShip, receiveAttack }
