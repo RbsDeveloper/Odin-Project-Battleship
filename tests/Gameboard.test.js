@@ -94,4 +94,11 @@ describe("Receiving an attack", () => {
         gameBoard.receiveAttack([3,5]);
         expect(ship.hits).toBe(1);
     })
+
+    test("Record coords of missed attacks", () => {
+        gameBoard.receiveAttack([3,5])
+        gameBoard.receiveAttack([4,5])
+        gameBoard.receiveAttack([3,7]);
+        expect(gameBoard.missedShots).toEqual([[3,5], [4,5], [3,7]]);
+    })
 })
