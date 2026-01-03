@@ -1,6 +1,7 @@
 export function Gameboard () {
     let grid = Array(10).fill(null).map(() => Array(10).fill(null));
-    
+    let missedShots = [];
+
     const placeShip = (ship, direction = "vertical", [row, col]) => {
 
         const cellStateObject = {
@@ -26,11 +27,12 @@ export function Gameboard () {
             grid[row][col].shipReference.hit();
             return true;
         }else{
+            missedShots.push([row, col]);
             return false;
         }
     }
     
-    return { grid, placeShip, receiveAttack }
+    return { grid, missedShots, placeShip, receiveAttack }
 }
 
 const isOutOfBounds = (shipObj, cellType) => {
