@@ -87,4 +87,11 @@ describe("Receiving an attack", () => {
         gameBoard.placeShip(ship, 'horizontal', [3,3])
         expect(gameBoard.receiveAttack([3,4])).toBe(true)
     })
+
+    test("Taking a pair of coordinates and call hit on the ship object", () => {
+        const ship = new Ship(4);
+        gameBoard.placeShip(ship, 'horizontal', [3,4]);
+        gameBoard.receiveAttack([3,5]);
+        expect(ship.hits).toBe(1);
+    })
 })
