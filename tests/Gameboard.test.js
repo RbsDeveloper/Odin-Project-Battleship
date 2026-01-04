@@ -114,3 +114,29 @@ describe("Receiving an attack", () => {
         })
     })
 })
+
+describe("Report wheather or not all ships have been sunk", () => {
+    test("Check if all ships have been sunk", () => {
+        const firstShip = new Ship(1);
+        const secondShip = new Ship(1);
+        const thirdShip = new Ship(1);
+        const forthShip = new Ship(1);
+        const fifthShip = new Ship(1);
+
+        gameBoard.placeShip(firstShip, 'horizontal', [1,1]);
+        gameBoard.placeShip(secondShip, 'horizontal', [1,3]);
+        gameBoard.placeShip(thirdShip, 'horizontal', [2,4]);
+        gameBoard.placeShip(forthShip, 'horizontal', [5,1]);
+        gameBoard.placeShip(fifthShip, 'horizontal', [6,2]);
+
+        expect(gameBoard.areAllShipSunk(gameBoard.shipStore)).toBe(false);
+
+        gameBoard.receiveAttack([1,1])
+        gameBoard.receiveAttack([1,3])
+        gameBoard.receiveAttack([2,4])
+        gameBoard.receiveAttack([5,1])
+        gameBoard.receiveAttack([6,2])
+
+        expect(gameBoard.areAllShipSunk(gameBoard.shipStore)).toBe(true);
+    })
+})
