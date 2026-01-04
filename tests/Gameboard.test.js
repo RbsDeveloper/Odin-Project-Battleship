@@ -101,4 +101,16 @@ describe("Receiving an attack", () => {
         gameBoard.receiveAttack([3,7]);
         expect(gameBoard.missedShots).toEqual([[3,5], [4,5], [3,7]]);
     })
+
+    test("Prevent double counting when the same cell is attacked twice", () => {
+        const ship = new Ship(4);
+        gameBoard.placeShip(ship, "horizontal", [3,3]);
+        gameBoard.receiveAttack([3,4])
+        expect(() => gameBoard.receiveAttack([3,4])).toThrow("Cell allready hit");
+        expect(gameBoard.grid[3][4]).toEqual({
+            occupied: true,
+            shipReference: ship,
+            hit: true,
+        })
+    })
 })
