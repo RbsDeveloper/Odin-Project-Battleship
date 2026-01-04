@@ -1,5 +1,6 @@
 export function Gameboard () {
     let grid = Array(10).fill(null).map(() => Array(10).fill(null));
+    let shipStore = {};
     let missedShots = [];
 
     const placeShip = (ship, direction = "vertical", [row, col]) => {
@@ -20,6 +21,8 @@ export function Gameboard () {
         }
 
         occupyCell(grid, coordsForShipPlacement, cellStateObject);
+
+        shipStore[ship] = ship;
     }
 
     const receiveAttack = ([row, col]) => {
@@ -41,8 +44,18 @@ export function Gameboard () {
             }   
         }
     }
+
+    const areAllShipSunk = (obj) => {
+        for(let key in obj){
+            if(obj[key].isSunk() === false){
+                return false;
+            }
+        }
+
+        return true
+    }
     
-    return { grid, missedShots, placeShip, receiveAttack }
+    return { grid, missedShots, shipStore, placeShip, receiveAttack, areAllShipSunk }
 }
 
 const isOutOfBounds = (shipObj, cellType) => {
