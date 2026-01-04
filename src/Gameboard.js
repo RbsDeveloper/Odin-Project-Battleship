@@ -24,11 +24,21 @@ export function Gameboard () {
 
     const receiveAttack = ([row, col]) => {
         if(grid[row][col] !== null){
-            grid[row][col].shipReference.hit();
-            return true;
+            if(!grid[row][col].hit){
+                grid[row][col].shipReference.hit();
+                grid[row][col].hit = true;
+                return true;
+            }else{
+                throw new Error("Cell allready hit")
+            }
+            
         }else{
-            missedShots.push([row, col]);
-            return false;
+            if(missedShots.some(([r,c]) => r === row && c === col)){
+                throw new Error("Cell allready hit") 
+            }else{
+                missedShots.push([row, col]);
+                return false;
+            }   
         }
     }
     
