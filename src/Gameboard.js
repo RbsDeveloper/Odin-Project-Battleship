@@ -20,7 +20,7 @@ export function Gameboard () {
 
         occupyCell(grid, coordsForShipPlacement, ship);
 
-        shipStore[ship] = ship;
+        shipStore[ship.id] = ship;
     }
 
     const receiveAttack = ([row, col]) => {

@@ -24,7 +24,7 @@ describe("Gameboard creation", () => {
 
 describe("Placing ships", () => {
     test("Placing 1 lengthed ship", () => {
-        const firstShip = new Ship(1);
+        const firstShip = new Ship(1, 'carrier');
         gameBoard.placeShip(firstShip, "horizontal", [4,4])
         expect(gameBoard.grid[4][4]).toEqual({
             hasShip: true,
@@ -34,7 +34,7 @@ describe("Placing ships", () => {
     })
 
     test("Placing a ship with a larger length", () => {
-        const largerShip = new Ship(3);
+        const largerShip = new Ship(3, 'carrier');
         gameBoard.placeShip(largerShip, "horizontal", [5,5]);
         expect(gameBoard.grid[5][5]).toEqual({
             hasShip: true,
@@ -54,7 +54,7 @@ describe("Placing ships", () => {
     })
 
     test("Place a ship that go outside the board", () => {
-        const largeShip = new Ship(5);
+        const largeShip = new Ship(5, 'destroyer');
         expect(() => gameBoard.placeShip(largeShip, "horizontal", [5,6])).toThrow("Ship can't be placed out of the grid")
     })
 
@@ -68,7 +68,7 @@ describe("Placing ships", () => {
     })
 
     test("Choose a direction for the ship placement", () => {
-        const verticalShip = new Ship(3);
+        const verticalShip = new Ship(3, 'carrier');
         gameBoard.placeShip(verticalShip, "vertical", [0,3]);
         expect(gameBoard.grid[0][3]).toEqual({
             hasShip: true,
@@ -90,13 +90,13 @@ describe("Placing ships", () => {
 
 describe("Receiving an attack", () => {
     test("Taking a pair of coordinates and check them", () => {
-        const ship = new Ship(3);
+        const ship = new Ship(3, "carrier");
         gameBoard.placeShip(ship, 'horizontal', [3,3])
         expect(gameBoard.receiveAttack([3,4])).toBe(true)
     })
 
     test("Taking a pair of coordinates and call hit on the ship object", () => {
-        const ship = new Ship(4);
+        const ship = new Ship(4, 'cruiser');
         gameBoard.placeShip(ship, 'horizontal', [3,4]);
         gameBoard.receiveAttack([3,5]);
         expect(ship.hits).toBe(1);
@@ -124,7 +124,7 @@ describe("Receiving an attack", () => {
     })
 
     test("Prevent double counting when the same cell is attacked twice", () => {
-        const ship = new Ship(4);
+        const ship = new Ship(4, 'destroyer');
         gameBoard.placeShip(ship, "horizontal", [3,3]);
         gameBoard.receiveAttack([3,4])
         expect(() => gameBoard.receiveAttack([3,4])).toThrow("Cell allready hit");
@@ -138,11 +138,11 @@ describe("Receiving an attack", () => {
 
 describe("Report wheather or not all ships have been sunk", () => {
     test("Check if all ships have been sunk", () => {
-        const firstShip = new Ship(1);
-        const secondShip = new Ship(1);
-        const thirdShip = new Ship(1);
-        const forthShip = new Ship(1);
-        const fifthShip = new Ship(1);
+        const firstShip = new Ship(1, 'carrier');
+        const secondShip = new Ship(1, 'destroyer');
+        const thirdShip = new Ship(1, 'cruiser');
+        const forthShip = new Ship(1, 'submarine');
+        const fifthShip = new Ship(1, 'battleship');
 
         gameBoard.placeShip(firstShip, 'horizontal', [1,1]);
         gameBoard.placeShip(secondShip, 'horizontal', [1,3]);
