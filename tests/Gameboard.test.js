@@ -17,7 +17,7 @@ describe("Gameboard creation", () => {
 
     test("All cells are initially empty", () => {
         gameBoard.grid.forEach(row => {
-            row.forEach(cell => expect(cell).toBeNull())
+            row.forEach(cell => expect(cell.shipReference).toBeNull())
         })
     })
 })
@@ -27,8 +27,9 @@ describe("Placing ships", () => {
         const firstShip = new Ship(1);
         gameBoard.placeShip(firstShip, "horizontal", [4,4])
         expect(gameBoard.grid[4][4]).toEqual({
-            occupied: true,
+            hasShip: true,
             shipReference: firstShip,
+            isHit: false,
         })
     })
 
@@ -36,16 +37,19 @@ describe("Placing ships", () => {
         const largerShip = new Ship(3);
         gameBoard.placeShip(largerShip, "horizontal", [5,5]);
         expect(gameBoard.grid[5][5]).toEqual({
-            occupied: true,
+            hasShip: true,
             shipReference: largerShip,
+            isHit: false
         })
         expect(gameBoard.grid[5][6]).toEqual({
-            occupied: true,
+            hasShip: true,
             shipReference: largerShip,
+            isHit: false
         })
         expect(gameBoard.grid[5][7]).toEqual({
-            occupied: true,
+            hasShip: true,
             shipReference: largerShip,
+            isHit: false
         })
     })
 
@@ -67,16 +71,19 @@ describe("Placing ships", () => {
         const verticalShip = new Ship(3);
         gameBoard.placeShip(verticalShip, "vertical", [0,3]);
         expect(gameBoard.grid[0][3]).toEqual({
-            occupied: true,
+            hasShip: true,
             shipReference: verticalShip,
+            isHit: false
         });
         expect(gameBoard.grid[1][3]).toEqual({
-            occupied: true,
+            hasShip: true,
             shipReference: verticalShip,
+            isHit: false
         });
         expect(gameBoard.grid[2][3]).toEqual({
-            occupied: true,
+            hasShip: true,
             shipReference: verticalShip,
+            isHit: false
         })
     })
 })
@@ -99,7 +106,21 @@ describe("Receiving an attack", () => {
         gameBoard.receiveAttack([3,5])
         gameBoard.receiveAttack([4,5])
         gameBoard.receiveAttack([3,7]);
-        expect(gameBoard.missedShots).toEqual([[3,5], [4,5], [3,7]]);
+        expect(gameBoard.grid[3][5]).toEqual({
+            hasShip: false,
+            shipReference: null,
+            isHit: true,
+        })
+        expect(gameBoard.grid[4][5]).toEqual({
+            hasShip: false,
+            shipReference: null,
+            isHit: true,
+        })
+        expect(gameBoard.grid[3][7]).toEqual({
+            hasShip: false,
+            shipReference: null,
+            isHit: true,
+        })
     })
 
     test("Prevent double counting when the same cell is attacked twice", () => {
@@ -108,9 +129,9 @@ describe("Receiving an attack", () => {
         gameBoard.receiveAttack([3,4])
         expect(() => gameBoard.receiveAttack([3,4])).toThrow("Cell allready hit");
         expect(gameBoard.grid[3][4]).toEqual({
-            occupied: true,
+            hasShip: true,
             shipReference: ship,
-            hit: true,
+            isHit: true,
         })
     })
 })

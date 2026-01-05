@@ -1,14 +1,12 @@
 export function Gameboard () {
-    let grid = Array(10).fill(null).map(() => Array(10).fill(null));
+    let grid = Array(10).fill(null).map(() => Array(10).fill(null).map(() =>({
+        hasShip: false,
+        shipReference: null,
+        isHit: false,
+    })));
     let shipStore = {};
-    let missedShots = [];
 
     const placeShip = (ship, direction = "vertical", [row, col]) => {
-
-        const cellStateObject = {
-            occupied: true,
-            shipReference: ship,
-        }
 
         const cellType = direction === "vertical" ? row : col;
         
@@ -20,28 +18,26 @@ export function Gameboard () {
             throw new Error("Ship can't be placed: overlapping ship")
         }
 
-        occupyCell(grid, coordsForShipPlacement, cellStateObject);
+        occupyCell(grid, coordsForShipPlacement, ship);
 
         shipStore[ship] = ship;
     }
 
     const receiveAttack = ([row, col]) => {
-        if(grid[row][col] !== null){
-            if(!grid[row][col].hit){
+        if(grid[row][col].hasShip === true){
+            if(!grid[row][col].isHit){
                 grid[row][col].shipReference.hit();
-                grid[row][col].hit = true;
+                grid[row][col].isHit = true;
                 return true;
             }else{
                 throw new Error("Cell allready hit")
             }
             
         }else{
-            if(missedShots.some(([r,c]) => r === row && c === col)){
-                throw new Error("Cell allready hit") 
-            }else{
-                missedShots.push([row, col]);
-                return false;
-            }   
+            if(grid[row][col].isHit === true) throw new Error("Cell allready hit") 
+            grid[row][col].isHit = true;
+            return false;
+               
         }
     }
 
@@ -55,7 +51,7 @@ export function Gameboard () {
         return true
     }
     
-    return { grid, missedShots, shipStore, placeShip, receiveAttack, areAllShipSunk }
+    return { grid, shipStore, placeShip, receiveAttack, areAllShipSunk }
 }
 
 const isOutOfBounds = (shipObj, cellType) => {
@@ -84,16 +80,17 @@ const getCellsForPlacement = (shipObj, direction, [rowCoords, colCoords]) => {
 
 const canBePlaced = (gameBoard, shipCoords) => {
     for(let i = 0; i < shipCoords.length; i++){
-        if(gameBoard[shipCoords[i][0]][shipCoords[i][1]] !== null){
+        if(gameBoard[shipCoords[i][0]][shipCoords[i][1]].hasShip === true){
             return false
         }
     }
     return true
 }
 
-const occupyCell = (gameBoard, shipCoords, objToPlace) => {
+const occupyCell = (gameBoard, shipCoords, shipObj) => {
     for(let i = 0; i < shipCoords.length; i++){
-        gameBoard[shipCoords[i][0]][shipCoords[i][1]] = objToPlace;
+        gameBoard[shipCoords[i][0]][shipCoords[i][1]].hasShip = true;
+        gameBoard[shipCoords[i][0]][shipCoords[i][1]].shipReference = shipObj;
     }
 }
 
