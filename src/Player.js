@@ -2,7 +2,11 @@ import { Gameboard } from "./Gameboard.js"
 
 export function Player (type, id) {
 
-    const gameboard = Gameboard()
+    const gameboard = Gameboard();
 
-    return {type, id, gameboard}
+    const attackEnemy = ([x,y], enemy) => {
+        enemy.gameboard.receiveAttack([x,y])
+    }
+
+    return {type, id, gameboard, attackEnemy}
 }
