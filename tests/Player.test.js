@@ -1,5 +1,6 @@
 import { Gameboard } from "../src/Gameboard.js";
 import { Player } from "../src/Player.js";
+import { Ship } from "../src/Ship.js";
 
 let humanPlayer;
 let computerPlayer; 
@@ -40,6 +41,20 @@ describe("Placing attacks", () => {
             shipReference: null,
             isHit: true,
         })
+    })
+
+    test("Attack a ship", () => {
+        const littleShip = new Ship (3, 'cruiser');
+        computerPlayer.gameboard.placeShip(littleShip, 'horizontal', [2,3]);
+        humanPlayer.attackEnemy([2,4], computerPlayer);
+
+        expect(computerPlayer.gameboard.grid[2][4]).toEqual({
+            hasShip: true,
+            shipReference: littleShip,
+            isHit: true,
+        })
+
+        expect(littleShip.hits).toBe(1);
     })
     
 })
