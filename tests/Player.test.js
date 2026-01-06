@@ -56,5 +56,13 @@ describe("Placing attacks", () => {
 
         expect(littleShip.hits).toBe(1);
     })
+
+    test("Attack twice the same cell", () => {
+        const littleShip = new Ship (3, 'cruiser');
+        computerPlayer.gameboard.placeShip(littleShip, 'horizontal', [2,3]);
+        humanPlayer.attackEnemy([2,4], computerPlayer);
+
+        expect(() => humanPlayer.attackEnemy([2,4], computerPlayer)).toThrow("Cell allready hit")
+    })
     
 })
