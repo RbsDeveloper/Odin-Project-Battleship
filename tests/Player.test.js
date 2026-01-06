@@ -29,3 +29,17 @@ describe("Check the right initialization of the players", () => {
         expect(computerPlayer.gameboard.grid.length).toBe(10);
     })
 })
+
+describe("Placing attacks", () => {
+
+    test("attack an empty cell", () => {
+        humanPlayer.attackEnemy([0,0], computerPlayer);
+
+        expect(computerPlayer.gameboard.grid[0][0]).toEqual({
+            hasShip: false,
+            shipReference: null,
+            isHit: true,
+        })
+    })
+    
+})
