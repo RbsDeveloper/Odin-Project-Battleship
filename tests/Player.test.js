@@ -19,6 +19,13 @@ describe("Check the right initialization of the players", () => {
         expect(humanPlayer.id).toBe('first')
         expect(computerPlayer.type).toBe('computer')
         expect(computerPlayer.id).toBe('second')
-        
+
+    });
+
+    test("Check if the player object has a gameboard", () => {
+        expect(humanPlayer.gameboard).toBeDefined();
+        expect(computerPlayer.gameboard).toBeDefined();
+        expect(humanPlayer.gameboard.grid.length).toBe(10);
+        expect(computerPlayer.gameboard.grid.length).toBe(10);
     })
 })
