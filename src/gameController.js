@@ -1,6 +1,8 @@
 import { Player } from "./Player.js";
 import { Ship } from "./Ship.js";
 
+let players;
+
 export const initGame = () => {
     const firstPlayer = new Player('human', 'first');
     const secondPlayer = new Player('computer', 'second');
@@ -31,17 +33,16 @@ export const initGame = () => {
     secondPlayer.gameboard.placeShip(forthCompShip,"horizontal", [6,1])
     secondPlayer.gameboard.placeShip(fifthCompShip,"horizontal", [9,1])
 
+    players = [firstPlayer, secondPlayer];
+}
 
+export function getBoards () {
 
+    const grids = players.map(player => ({
+        id : player.id,
+        type: player.type,
+        grid: player.gameboard.grid.map(row => row.map(cell => ({...cell})))
+    }))
 
-    function getBoards () {
-        const players = [firstPlayer, secondPlayer];
-        const grids = players.map(player => {
-            return player.gameboard.grid.map(row => row.map(cell => ({...cell})))
-        })
-
-        return grids;
-    }
-
-    return { getBoards }
+    return grids;
 }
