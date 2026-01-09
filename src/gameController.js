@@ -38,11 +38,11 @@ export const initGame = () => {
 
 export function getBoards () {
 
-    const grids = players.map(player => ({
+    const boards = players.map(player => ({
         id : player.id,
         type: player.type,
         grid: player.gameboard.grid.map(row => row.map(cell => ({...cell})))
     }))
 
-    return grids;
+    return boards;
 }
