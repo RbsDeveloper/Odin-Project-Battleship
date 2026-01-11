@@ -96,6 +96,18 @@ const shipPlacementDialog = () => {
     return dialogEl;
 }
 
+const renderGameScreen = () => {
+    const mainContainer = createCompleteElement("main", [], "",);
+
+    const leftFleetContainer = createCompleteElement("div", ["playerFleetContainer"],);
+    const middleContainer = createCompleteElement("div", ["gameboardsContainer"],)
+    const rightFleetContainer = createCompleteElement("div", ["opponentFleetContainer"]);
+
+    mainContainer.append(leftFleetContainer, middleContainer, rightFleetContainer);
+
+    return mainContainer
+}
+
 const playerBoardsArea = () => {
     const main = createCompleteElement("main");
     const boardsData = getBoards();
