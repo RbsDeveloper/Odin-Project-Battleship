@@ -1,10 +1,22 @@
+import { Ship } from "./Ship.js";
+
 export function Gameboard () {
     let grid = Array(10).fill(null).map(() => Array(10).fill(null).map(() =>({
         hasShip: false,
         shipReference: null,
         isHit: false,
     })));
-    let shipStore = {};
+
+    const shipDetailsForCreation = [
+        { id: "Carrier", length: 5, },
+        { id: "Battleship",length: 4, },
+        { id: "Cruiser",length: 3, },
+        { id: "Submarine",length: 3, },
+        { id: "Destroyer",length: 2, },
+    ];
+
+    //Creates the ships instances using the details from shipDetails array
+    const fleet = shipDetailsForCreation.map(ship => new Ship(ship.length, ship.id));
 
     const placeShip = (ship, direction = "vertical", [row, col]) => {
 
@@ -19,8 +31,6 @@ export function Gameboard () {
         }
 
         occupyCell(grid, coordsForShipPlacement, ship);
-
-        shipStore[ship.id] = ship;
     }
 
     const receiveAttack = ([row, col]) => {
@@ -41,17 +51,15 @@ export function Gameboard () {
         }
     }
 
-    const areAllShipSunk = (obj) => {
-        for(let key in obj){
-            if(obj[key].isSunk() === false){
-                return false;
-            }
+    const areAllShipSunk = () => {
+        for(const ship of fleet){
+            if(!ship.isSunk()) return false
         }
 
         return true
     }
     
-    return { grid, shipStore, placeShip, receiveAttack, areAllShipSunk }
+    return { grid, fleet, placeShip, receiveAttack, areAllShipSunk }
 }
 
 const isOutOfBounds = (shipObj, cellType) => {
