@@ -1,5 +1,4 @@
 import { Gameboard } from "../src/Gameboard.js";
-import { Ship } from "../src/Ship.js";
 let gameBoard;
 
 beforeEach(()=> {
@@ -24,65 +23,59 @@ describe("Gameboard creation", () => {
 
 describe("Placing ships", () => {
     test("Placing 1 lengthed ship", () => {
-        const firstShip = new Ship(1, 'carrier');
-        gameBoard.placeShip(firstShip, "horizontal", [4,4])
+        gameBoard.placeShip(gameBoard.fleet[0], "horizontal", [4,4])
         expect(gameBoard.grid[4][4]).toEqual({
             hasShip: true,
-            shipReference: firstShip,
+            shipReference: gameBoard.fleet[0],
             isHit: false,
         })
     })
 
     test("Placing a ship with a larger length", () => {
-        const largerShip = new Ship(3, 'carrier');
-        gameBoard.placeShip(largerShip, "horizontal", [5,5]);
+        gameBoard.placeShip(gameBoard.fleet[3], "horizontal", [5,5]);
         expect(gameBoard.grid[5][5]).toEqual({
             hasShip: true,
-            shipReference: largerShip,
+            shipReference: gameBoard.fleet[3],
             isHit: false
         })
         expect(gameBoard.grid[5][6]).toEqual({
             hasShip: true,
-            shipReference: largerShip,
+            shipReference: gameBoard.fleet[3],
             isHit: false
         })
         expect(gameBoard.grid[5][7]).toEqual({
             hasShip: true,
-            shipReference: largerShip,
+            shipReference: gameBoard.fleet[3],
             isHit: false
         })
     })
 
     test("Place a ship that go outside the board", () => {
-        const largeShip = new Ship(5, 'destroyer');
-        expect(() => gameBoard.placeShip(largeShip, "horizontal", [5,6])).toThrow("Ship can't be placed out of the grid")
+        expect(() => gameBoard.placeShip(gameBoard.fleet[0], "horizontal", [5,6])).toThrow("Ship can't be placed out of the grid")
     })
 
     test("Place a ship that overlaps", () => {
-        const largerShip = new Ship(5);
-        const smallShip = new Ship(3);
         expect(() => {
-            gameBoard.placeShip(largerShip, "horizontal", [5,4])
-            gameBoard.placeShip(smallShip, "horizontal", [5,2])
+            gameBoard.placeShip(gameBoard.fleet[0], "horizontal", [5,4])
+            gameBoard.placeShip(gameBoard.fleet[2], "horizontal", [5,2])
         }).toThrow("Ship can't be placed: overlapping ship")
     })
 
     test("Choose a direction for the ship placement", () => {
-        const verticalShip = new Ship(3, 'carrier');
-        gameBoard.placeShip(verticalShip, "vertical", [0,3]);
+        gameBoard.placeShip(gameBoard.fleet[3], "vertical", [0,3]);
         expect(gameBoard.grid[0][3]).toEqual({
             hasShip: true,
-            shipReference: verticalShip,
+            shipReference: gameBoard.fleet[3],
             isHit: false
         });
         expect(gameBoard.grid[1][3]).toEqual({
             hasShip: true,
-            shipReference: verticalShip,
+            shipReference: gameBoard.fleet[3],
             isHit: false
         });
         expect(gameBoard.grid[2][3]).toEqual({
             hasShip: true,
-            shipReference: verticalShip,
+            shipReference: gameBoard.fleet[3],
             isHit: false
         })
     })
@@ -90,16 +83,14 @@ describe("Placing ships", () => {
 
 describe("Receiving an attack", () => {
     test("Taking a pair of coordinates and check them", () => {
-        const ship = new Ship(3, "carrier");
-        gameBoard.placeShip(ship, 'horizontal', [3,3])
+        gameBoard.placeShip(gameBoard.fleet[1], 'horizontal', [3,3])
         expect(gameBoard.receiveAttack([3,4])).toBe(true)
     })
 
     test("Taking a pair of coordinates and call hit on the ship object", () => {
-        const ship = new Ship(4, 'cruiser');
-        gameBoard.placeShip(ship, 'horizontal', [3,4]);
+        gameBoard.placeShip(gameBoard.fleet[3], 'horizontal', [3,4]);
         gameBoard.receiveAttack([3,5]);
-        expect(ship.hits).toBe(1);
+        expect(gameBoard.fleet[3].hits).toBe(1);
     })
 
     test("Record coords of missed attacks", () => {
@@ -124,13 +115,13 @@ describe("Receiving an attack", () => {
     })
 
     test("Prevent double counting when the same cell is attacked twice", () => {
-        const ship = new Ship(4, 'destroyer');
-        gameBoard.placeShip(ship, "horizontal", [3,3]);
+        
+        gameBoard.placeShip(gameBoard.fleet[1], "horizontal", [3,3]);
         gameBoard.receiveAttack([3,4])
         expect(() => gameBoard.receiveAttack([3,4])).toThrow("Cell allready hit");
         expect(gameBoard.grid[3][4]).toEqual({
             hasShip: true,
-            shipReference: ship,
+            shipReference: gameBoard.fleet[1],
             isHit: true,
         })
     })
@@ -138,26 +129,36 @@ describe("Receiving an attack", () => {
 
 describe("Report wheather or not all ships have been sunk", () => {
     test("Check if all ships have been sunk", () => {
-        const firstShip = new Ship(1, 'carrier');
-        const secondShip = new Ship(1, 'destroyer');
-        const thirdShip = new Ship(1, 'cruiser');
-        const forthShip = new Ship(1, 'submarine');
-        const fifthShip = new Ship(1, 'battleship');
 
-        gameBoard.placeShip(firstShip, 'horizontal', [1,1]);
-        gameBoard.placeShip(secondShip, 'horizontal', [1,3]);
-        gameBoard.placeShip(thirdShip, 'horizontal', [2,4]);
-        gameBoard.placeShip(forthShip, 'horizontal', [5,1]);
-        gameBoard.placeShip(fifthShip, 'horizontal', [6,2]);
 
-        expect(gameBoard.areAllShipSunk(gameBoard.shipStore)).toBe(false);
+        gameBoard.placeShip(gameBoard.fleet[0], 'horizontal', [1,1]);
+        gameBoard.placeShip(gameBoard.fleet[1], 'horizontal', [2,3]);
+        gameBoard.placeShip(gameBoard.fleet[2], 'horizontal', [3,4]);
+        gameBoard.placeShip(gameBoard.fleet[3], 'horizontal', [5,1]);
+        gameBoard.placeShip(gameBoard.fleet[4], 'horizontal', [6,2]);
+
+        expect(gameBoard.areAllShipSunk()).toBe(false);
 
         gameBoard.receiveAttack([1,1])
+        gameBoard.receiveAttack([1,2])
         gameBoard.receiveAttack([1,3])
+        gameBoard.receiveAttack([1,4])
+        gameBoard.receiveAttack([1,5])
+        gameBoard.receiveAttack([2,3])
         gameBoard.receiveAttack([2,4])
+        gameBoard.receiveAttack([2,5])
+        gameBoard.receiveAttack([2,6])
+        gameBoard.receiveAttack([3,4])
+        gameBoard.receiveAttack([3,5])
+        gameBoard.receiveAttack([3,6])
         gameBoard.receiveAttack([5,1])
+        gameBoard.receiveAttack([5,2])
+        gameBoard.receiveAttack([5,3])
         gameBoard.receiveAttack([6,2])
+        gameBoard.receiveAttack([6,3])
 
-        expect(gameBoard.areAllShipSunk(gameBoard.shipStore)).toBe(true);
+        console.log(gameBoard.fleet[0])
+
+        expect(gameBoard.areAllShipSunk()).toBe(true);
     })
 })
