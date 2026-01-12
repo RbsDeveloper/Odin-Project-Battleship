@@ -68,32 +68,20 @@ const gameSettingsDialog = () => {
 
 }
 
-const shipPlacementDialog = () => {
-    const dialogEl = createCompleteElement("dialog", ["placementDialog"], "", {id: "placementWindow"});
-    //in the leftWrapper we will have a container from which we'll select the ship we want to place
-    //and we will have also the possibility to change ships direction, random place them and reset their placement
-    const leftWrapper = createCompleteElement('div', ["leftWrapper"]);
-    const shipsContainer = createCompleteElement("div", ["shipContainer"], "", {});
-    const leftBtnsContainer = createCompleteElement("div", ["leftBtnsContainer"]);
+const createShipPlacementUi = () => {
+    const placementContainer = createCompleteElement("div", ["placementContainer"], "", {id: "placementModule"});
+    const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {});
+    const palcementControls = createCompleteElement("div", ["btnContainer"]);
 
     const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "Horizontal", {id: "shipPlacementBtn"});
     const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement", {id: "randomBtn"});
     const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
+    const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement", {id: "confirmBtn"});
 
-    leftBtnsContainer.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn);
-    leftWrapper.append(shipsContainer, leftBtnsContainer);
-    //In the rightWrapper we will have a temporaryBoard used just to obtain the coords of the cells where we place the ships 
-    //and a start/play game btn that will be available for clicks only after all the ships will be placed. 
-    const rightWrapper = createCompleteElement("div", ["rightWrapper"], "",);
-    const placementBoardContainer = createCompleteElement("div", ["placementBoardContainer"], "", {id: "placementBoardContainer"});
-    const rightBtnContainer = createCompleteElement("div", ["rightBtnContainer"], "", {id: "rightBtnContainer"});
-    const startGameBtn = createCompleteElement("button", ["btn", "playGameBtn"], "Play!", {id: "playBtn"});
+    palcementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn, confirmPlacementBtn);
+    placementContainer.append(fleetSelector, palcementControls);
 
-    rightBtnContainer.append(startGameBtn);
-    rightWrapper.append(placementBoardContainer, rightBtnContainer);
-    dialogEl.append(leftWrapper, rightWrapper);
-
-    return dialogEl;
+    return placementContainer
 }
 
 const renderGameScreen = () => {
