@@ -1,4 +1,4 @@
-import { getBoards } from "./gameController.js";
+import { getBoards, extractShipDetails } from "./gameController.js";
 import { createCompleteElement } from "./utils.js";
 /*
     UI components needed before the main game screen:
@@ -70,16 +70,18 @@ const gameSettingsDialog = () => {
 
 const createShipPlacementUi = () => {
     const placementContainer = createCompleteElement("div", ["placementContainer"], "", {id: "placementModule"});
-    const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {});
-    const palcementControls = createCompleteElement("div", ["btnContainer"]);
+    const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {id: "fleetSelector"});
+    const placementControls = createCompleteElement("div", ["btnContainer"]);
 
     const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "Horizontal", {id: "shipPlacementBtn"});
     const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement", {id: "randomBtn"});
     const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
     const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement", {id: "confirmBtn"});
 
-    palcementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn, confirmPlacementBtn);
-    placementContainer.append(fleetSelector, palcementControls);
+    placementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn, confirmPlacementBtn);
+    placementContainer.append(fleetSelector, placementControls);
+
+    buildShip(extractShipDetails());
 
     return placementContainer
 }
@@ -140,6 +142,15 @@ const createCells = (container, board) => {
         }
 
     }
+}
+
+const buildShip = (shipDetails) => {
+    const destination = document.getElementById("fleetSelector");
+
+    shipDetails.forEach(item => {
+        const build = createCompleteElement("div", ["ship"], `${item.id}`, {id: `${item.id}`});
+        destination.append(build);
+    })   
 }
 
 export const createLayout = () => {
