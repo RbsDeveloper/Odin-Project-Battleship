@@ -59,7 +59,7 @@ export function Gameboard () {
         return true
     }
     
-    return { grid, fleet, placeShip, receiveAttack, areAllShipSunk }
+    return { grid, fleet, shipDetailsForCreation, placeShip, receiveAttack, areAllShipSunk }
 }
 
 const isOutOfBounds = (shipObj, cellType) => {

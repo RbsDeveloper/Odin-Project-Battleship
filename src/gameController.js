@@ -46,3 +46,10 @@ export function getBoards () {
 
     return boards;
 }
+
+export function extractShipDetails () {
+    const details = players[0].gameboard.shipDetailsForCreation;
+
+    return details;
+}
+
