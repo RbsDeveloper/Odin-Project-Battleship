@@ -1,39 +1,55 @@
 import { Player } from "./Player.js";
-import { Ship } from "./Ship.js";
+import { layoutFunctions } from "./ui.js";
 
 let players;
 
+const startGameFlow = () => {
+    const startModal = layoutFunctions().startDialog();
+    document.body.appendChild(startModal);
+    startModal.show();
+
+    const startBtn = document.getElementById("sgBtn");
+
+    startBtn.addEventListener("click", () => {
+        startModal.close()
+        startModal.remove();
+        showGameSettings()
+    })
+}
+
+const showGameSettings = () => {
+    const settingsModal = layoutFunctions().gameSettingsDialog();
+    document.body.appendChild(settingsModal);
+    settingsModal.show();
+
+    toggleSecondPlayerInput()
+
+    const form = document.querySelector("#gameSettingsForm");
+    
+    form.addEventListener('submit', (e)=> {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const config = Object.fromEntries(formData);
+        
+        settingsModal.close();
+        settingsModal.remove();
+        
+        setUpPlayer(config);
+    })
+
+    
+
+}
+
 export const initGame = () => {
+
+    startGameFlow()
+
+/*
     const firstPlayer = new Player('human', 'first');
     const secondPlayer = new Player('computer', 'second');
 
-    //initial hardcoded ships
-
-    const firstShip = new Ship(1, 'carrier');
-    const secondShip = new Ship(2, 'destroyer');
-    const thirdShip = new Ship(3, 'cruiser');
-    const forthShip = new Ship(4, 'submarine');
-    const fifthShip = new Ship(5, 'battleship');
-
-    firstPlayer.gameboard.placeShip(firstShip,"horizontal", [0,1])
-    firstPlayer.gameboard.placeShip(secondShip,"horizontal", [2,1])
-    firstPlayer.gameboard.placeShip(thirdShip,"horizontal", [4,1])
-    firstPlayer.gameboard.placeShip(forthShip,"horizontal", [6,1])
-    firstPlayer.gameboard.placeShip(fifthShip,"horizontal", [9,1])
-
-    const firstCompShip = new Ship(1, 'carrier');
-    const secondCompShip = new Ship(2, 'destroyer');
-    const thirdCompShip = new Ship(3, 'cruiser');
-    const forthCompShip = new Ship(4, 'submarine');
-    const fifthCompShip = new Ship(5, 'battleship');
-
-    secondPlayer.gameboard.placeShip(firstCompShip,"horizontal", [0,1])
-    secondPlayer.gameboard.placeShip(secondCompShip,"horizontal", [2,1])
-    secondPlayer.gameboard.placeShip(thirdCompShip,"horizontal", [4,1])
-    secondPlayer.gameboard.placeShip(forthCompShip,"horizontal", [6,1])
-    secondPlayer.gameboard.placeShip(fifthCompShip,"horizontal", [9,1])
-
-    players = [firstPlayer, secondPlayer];
+    players = [firstPlayer, secondPlayer];*/
 }
 
 export function getBoards () {
@@ -53,3 +69,31 @@ export function extractShipDetails () {
     return details;
 }
 
+function toggleSecondPlayerInput () {
+
+    const fieldset = document.getElementById("btnFieldset");
+
+    fieldset.addEventListener('change', (e) => {
+        if(e.target.value === "pvp"){
+            if(!document.getElementById("secondPlayerInput")){
+                layoutFunctions().createSecondPlayerInput()
+            }
+        }else{
+            layoutFunctions().removeSecondPlayerInput()
+        }
+        
+    })
+}
+ 
+const setUpPlayer = (settings) => {
+    const firstPlayer = new Player("human", settings.firstPlayerName);
+    let seconPlayer;
+
+    if(settings.mode === "pvp"){
+        seconPlayer = new Player("human", settings.seconPlayerName);
+    }else{
+        seconPlayer = new Player("computer", "Computer");
+    }
+
+    players = [firstPlayer, seconPlayer];
+}

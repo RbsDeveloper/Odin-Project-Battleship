@@ -1,3 +1,6 @@
+body {
+    background-color: #8399a8;
+}
 
 main {
     height: 100vh;
@@ -20,4 +23,8 @@ main {
     height: 48px;
     border: 1px solid black;
     background-color: white;
+}
+
+#startingWindow {
+    background-color: red;
 }

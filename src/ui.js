@@ -39,7 +39,7 @@ const gameSettingsDialog = () => {
     //elements inside the form
 
     //radio inputs for players
-    const fieldsetForBtns = createCompleteElement('fieldset');
+    const gameModeFieldset = createCompleteElement('fieldset', ["btnFieldset"], "", {id: "btnFieldset"});
     const legend =  createCompleteElement('legend', [], "Choose your opponent")
     const firstLabel = createCompleteElement("label", [], "Player vs Computer", {for: "pvcMode"});
     const firstInput = createCompleteElement("input", [], "", {type: "radio", value: "pvc", id: "pvcMode", name: "mode",});
@@ -47,25 +47,36 @@ const gameSettingsDialog = () => {
     const secondLabel = createCompleteElement("label", [], "Player vs Player", {for: "pvpMode"});
     const secondInput = createCompleteElement("input", [], "", {type: "radio", value: "pvp", id: "pvpMode", name: "mode",});
 
-    fieldsetForBtns.append(legend, firstLabel, firstInput, secondLabel, secondInput);
+    gameModeFieldset.append(legend, firstLabel, firstInput, secondLabel, secondInput);
 
     //Name input
+    const fieldSetForNames = createCompleteElement("fieldset", ['pnFieldset'], "", {id: "nameFieldset"})
     const thirdLabel = createCompleteElement("label", [], "Player name:", {for: "firstPlayerInput"});
     const nameInput = createCompleteElement("input", [], "", {type: "text", name: "firstPlayerName", id:"firstPlayerInput",});
     nameInput.required = true;
-    
-
-    //Optional second name input
-    const forthLabel = createCompleteElement("label", [], "Second player name:", {id: "secondPlayerLabel", for: "secondPlayerINput"});
-    const secondNameInput = createCompleteElement("input", [], "", {type: "text", id:"secondPlayerInput", name: "secondPlayerInput",})
+    fieldSetForNames.append(thirdLabel, nameInput);
 
     const submitBtn = createCompleteElement("button", ["btn", "formSubmitBtn"], "Next", {type: "submit"});
 
-    formEl.append(fieldsetForBtns, thirdLabel,nameInput, forthLabel, secondNameInput, submitBtn);
+    formEl.append(gameModeFieldset, fieldSetForNames, submitBtn);
     dialogEl.append(formEl);
 
     return dialogEl;
 
+}
+//Optional second name input
+export const createSecondPlayerInput = () => {
+    const nameFieldset = document.getElementById("nameFieldset");
+
+    const label = createCompleteElement("label", [], "Second player name:", {id: "secondPlayerLabel", for: "secondPlayerInput"});
+    const secondNameInput = createCompleteElement("input", [], "", {type: "text", id:"secondPlayerInput", name: "secondPlayerInput",})
+
+    nameFieldset.append(label, secondNameInput);
+}
+
+export const removeSecondPlayerInput = () => {
+     document.getElementById("secondPlayerLabel")?.remove();
+     document.getElementById("secondPlayerInput")?.remove();
 }
 
 const createShipPlacementUi = () => {
@@ -90,8 +101,11 @@ const renderGameScreen = () => {
     const mainContainer = createCompleteElement("main", [], "",);
 
     const leftFleetContainer = createCompleteElement("div", ["playerFleetContainer"],);
-    const middleContainer = createCompleteElement("div", ["gameboardsContainer"],)
+    const middleContainer = createCompleteElement("div", ["gameboardsContainer"], "", {id: "boardsArea"})
     const rightFleetContainer = createCompleteElement("div", ["opponentFleetContainer"]);
+
+    leftFleetContainer.append(createShipPlacementUi());
+    rightFleetContainer.append(createShipPlacementUi())
 
     mainContainer.append(leftFleetContainer, middleContainer, rightFleetContainer);
 
@@ -99,11 +113,11 @@ const renderGameScreen = () => {
 }
 
 const playerBoardsArea = () => {
-    const main = createCompleteElement("main");
+    const boardsDestination = document.getElementById("boardsArea");
     const boardsData = getBoards();
     
     boardsData.forEach(playerGrid => {
-        main.append(renderGameboard(playerGrid));
+        boardsDestination.append(renderGameboard(playerGrid));
     });
     
     return main
@@ -153,10 +167,9 @@ const buildShip = (shipDetails) => {
     })   
 }
 
-export const createLayout = () => {
-    const content = document.getElementById("content");
+export const layoutFunctions = () => {
 
-    content.append(playerBoardsArea())
+    return {startDialog , gameSettingsDialog, createSecondPlayerInput, removeSecondPlayerInput }
 }
 
 
