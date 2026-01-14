@@ -11,6 +11,16 @@ const gameState = {
     currentPLayer: 0,
 }
 
+export function triggerPhase(phase) {
+    gameState.gamePhase = phase;
+    switch(phase) {
+        case "start": enterStartPhase(); break;
+        case "settings": enterSettingsPhase(); break;
+        case "placement": enterPlacementPhase(); break;
+        case "game": enterGamePhase(); break;
+    }
+}
+
 
 export const initGame = () => {  
 
