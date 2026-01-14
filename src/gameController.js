@@ -1,8 +1,15 @@
 import { Player } from "./Player.js";
-import { buildShip, layoutFunctions, renderGameScreen } from "./ui.js";
+import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi } from "./ui.js";
 
 let players;
 let dataFromForm; 
+
+const gameState = {
+    players : [],
+    mode: null,
+    gamePhase: null,
+    currentPLayer: 0,
+}
 
 
 export const initGame = () => {  
@@ -17,7 +24,7 @@ export const initGame = () => {
 }
 
 const enterStartPhase = () => {
-    const startModal = layoutFunctions().startDialog();
+    const startModal = startDialog();
     document.body.appendChild(startModal);
     startModal.show();
 }
@@ -25,7 +32,7 @@ const enterStartPhase = () => {
 const enterSettingsPhase = () => {
     const startModal = document.getElementById("startingWindow");
     const startBtn = document.getElementById("sgBtn");
-    const formElement = layoutFunctions().insertSettingsForm();
+    const formElement = insertSettingsForm();
     startBtn.remove();
     startModal.append(formElement);
     toggleSecondPlayerInput()
@@ -78,10 +85,10 @@ function toggleSecondPlayerInput () {
     fieldset.addEventListener('change', (e) => {
         if(e.target.value === "pvp"){
             if(!document.getElementById("secondPlayerInput")){
-                layoutFunctions().createSecondPlayerInput()
+                createSecondPlayerInput()
             }
         }else{
-            layoutFunctions().removeSecondPlayerInput()
+            removeSecondPlayerInput()
         }
     })
 }
@@ -90,20 +97,20 @@ function renderPlacementUi () {
     //we create the player instances
     const boardsInfo = getBoards();
     //we append the general layout and the boards for both players
-    document.body.append(layoutFunctions().renderGameScreen());
-    layoutFunctions().createPlayerBoardsArea(boardsInfo);
+    document.body.append(renderGameScreen());
+    createPlayerBoardsArea(boardsInfo);
     //we populate the fleetContainers now
     
     const leftFleet = document.getElementById("leftFleet");
     const rightFleet = document.getElementById("rightFleet");
     console.log(players[0].id)
-    leftFleet.append(layoutFunctions().createShipPlacementUi(players[0].id));
+    leftFleet.append(createShipPlacementUi(players[0].id));
     const leftFleetSelector = document.querySelector(`.shipContainer[data-player-id = '${players[0].id}']`);
     
     buildShip(players[0].gameboard.shipDetailsForCreation, leftFleetSelector);
 
     if(dataFromForm.mode === 'pvp'){
-        rightFleet.append(layoutFunctions().createShipPlacementUi(players[1].id));
+        rightFleet.append(createShipPlacementUi(players[1].id));
         const rightFleetSelector = document.querySelector(`.shipContainer[data-player-id = "${players[1].id}"]`);
         buildShip(players[1].gameboard.shipDetailsForCreation, rightFleetSelector); 
     }
