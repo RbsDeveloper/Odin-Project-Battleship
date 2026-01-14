@@ -1,7 +1,7 @@
 import { createCompleteElement } from "./utils.js";
 
 //FUNCTION THAT CREATES THE START GAME DIALOG
-export const startDialog = () => {
+export function startDialog () {
     const dialogEl = createCompleteElement("dialog", ["startingDialog"], "", {id: "startingWindow"});
     const gameTitle = createCompleteElement("h1", ["gameTitle"], "Battleship");
     const startGameBtn = createCompleteElement('button', ["btn", "startGameBtn"], "Start Game", {id: "sgBtn"});
@@ -12,7 +12,7 @@ export const startDialog = () => {
 }
 
 //FUNCTION THAT CREATES THE SETTINGS GAME DIALOG
-export const insertSettingsForm = () => {
+export function insertSettingsForm () {
     const formEl = createCompleteElement("form", ["settingsForm"], "", {id: "gameSettingsForm"});
 
     //elements inside the form
@@ -43,7 +43,7 @@ export const insertSettingsForm = () => {
 
 }
 //FUNCTION THAT CREATES AND INSERTS THE SECOND NAME INPUT BASED ON THE GAME MODE
-export const createSecondPlayerInput = () => {
+export function createSecondPlayerInput () {
     const nameFieldset = document.getElementById("nameFieldset");
 
     const label = createCompleteElement("label", [], "Second player name:", {id: "secondPlayerLabel", for: "secondPlayerInput"});
@@ -52,13 +52,13 @@ export const createSecondPlayerInput = () => {
     nameFieldset.append(label, secondNameInput);
 }
 //FUNCTION THAT REMOVES THE SECOND NAME INPUT
-export const removeSecondPlayerInput = () => {
+export function removeSecondPlayerInput () {
      document.getElementById("secondPlayerLabel")?.remove();
      document.getElementById("secondPlayerInput")?.remove();
 }
 
 //FUNCTION THAT CREATES THE GAME SCREEN OR ARENA
-export const renderGameScreen = () => {
+export function renderGameScreen () {
     const mainContainer = createCompleteElement("main", [], "",);
 
     const leftFleetContainer = createCompleteElement("div", ["playerFleetContainer"], "", {id: "leftFleet"});
@@ -73,7 +73,7 @@ export const renderGameScreen = () => {
     return mainContainer
 }
 
-const createPlayerBoardsArea = (boardsData) => {
+export function createPlayerBoardsArea  (boardsData) {
     const boardsDestination = document.getElementById("boardsArea");
     
     boardsData.forEach(playerGrid => {
@@ -81,42 +81,7 @@ const createPlayerBoardsArea = (boardsData) => {
     });
 }
 
-const renderGameboard = (grid) => {
-
-    const boardContainer = createCompleteElement('div', ['board'], '', {'data-player-id': grid.id})
-    /*
-    boardContainer.addEventListener('click', (e) => {
-        if(!e.target.classList.contains('cell')) return 
-
-        console.log(e.target)
-        
-        const row = e.target.dataset.row
-        const col = e.target.dataset.col
-        const playerId = boardContainer.dataset.playerId
-
-        return console.log({row, col, playerId})
-    })*/
-
-    createCells(boardContainer, grid.grid);
-
-    return boardContainer;
-}
-//HELPER FUNCTION THAT CREATES THE CELL OF EACH GAMEBOARD
-const createCells = (container, board) => {
-    for(let i = 0 ; i < board.length; i++){
-
-        for(let j = 0; j < board[i].length ; j++){
-
-            const cell = createCompleteElement('div', ['cell'], '', {"data-row": `${i}`, "data-col": `${j}`})
-
-            container.append(cell);
-
-        }
-
-    }
-}
-
-export const buildShip = (shipDetails, destination) => {
+export function buildShip (shipDetails, destination) {
 
     shipDetails.forEach(item => {
         const build = createCompleteElement("div", ["ship"], `${item.id}`, {id: `${item.id}`});
@@ -124,7 +89,7 @@ export const buildShip = (shipDetails, destination) => {
     })   
 }
 
-const createShipPlacementUi = (identityParam) => {
+export function createShipPlacementUi  (identityParam) {
     const placementContainer = createCompleteElement("div", ["placementContainer"]);
     const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {"data-player-id": `${identityParam}`});
     const placementControls = createCompleteElement("div", ["btnContainer"], "", {"data-player-id": `${identityParam}`});
@@ -140,10 +105,31 @@ const createShipPlacementUi = (identityParam) => {
     return placementContainer
 }
 
-export const layoutFunctions = () => {
 
-    return {startDialog , insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, renderGameboard, createPlayerBoardsArea, createShipPlacementUi, buildShip }
+function renderGameboard (grid) {
+
+    const boardContainer = createCompleteElement('div', ['board'], '', {'data-player-id': grid.id})
+
+    createCells(boardContainer, grid.grid);
+
+    return boardContainer;
 }
+
+function createCells (container, board) {
+    for(let i = 0 ; i < board.length; i++){
+
+        for(let j = 0; j < board[i].length ; j++){
+
+            const cell = createCompleteElement('div', ['cell'], '', {"data-row": `${i}`, "data-col": `${j}`})
+
+            container.append(cell);
+
+        }
+
+    }
+}
+
+
 
 
 
