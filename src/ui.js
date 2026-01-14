@@ -48,7 +48,7 @@ export function createSecondPlayerInput () {
 
     const label = createCompleteElement("label", [], "Second player name:", {id: "secondPlayerLabel", for: "secondPlayerInput"});
     const secondNameInput = createCompleteElement("input", [], "", {type: "text", id:"secondPlayerInput", name: "secondPlayerInput",})
-
+    secondNameInput.required = true;
     nameFieldset.append(label, secondNameInput);
 }
 //FUNCTION THAT REMOVES THE SECOND NAME INPUT
