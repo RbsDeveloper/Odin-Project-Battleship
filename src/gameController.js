@@ -1,10 +1,8 @@
 import { Player } from "./Player.js";
 import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi } from "./ui.js";
+import { attachStartBtnLister } from "./events.js";
 
-let players;
-let dataFromForm; 
-
-const gameState = {
+export const gameState = {
     players : [],
     mode: null,
     gamePhase: null,
@@ -21,29 +19,21 @@ export function triggerPhase(phase) {
     }
 }
 
-
 export const initGame = () => {  
-
-    enterStartPhase()
-
+    triggerPhase("start");
     const startBtn = document.getElementById("sgBtn");
-    
-    startBtn.addEventListener("click", () => {
-        enterSettingsPhase()
-    })
+    attachStartBtnLister(startBtn);
 }
 
 const enterStartPhase = () => {
-    const startModal = startDialog();
-    document.body.appendChild(startModal);
-    startModal.show();
+    document.body.append(startDialog())
+    const modal = document.getElementById("startingWindow");
+    modal.show()
 }
 
 const enterSettingsPhase = () => {
     const startModal = document.getElementById("startingWindow");
-    const startBtn = document.getElementById("sgBtn");
     const formElement = insertSettingsForm();
-    startBtn.remove();
     startModal.append(formElement);
     toggleSecondPlayerInput()
 
