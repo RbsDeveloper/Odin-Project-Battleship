@@ -41,13 +41,11 @@ export function Gameboard () {
                 return true;
             }else{
                 throw new Error("Cell allready hit")
-            }
-            
+            }            
         }else{
             if(grid[row][col].isHit === true) throw new Error("Cell allready hit") 
             grid[row][col].isHit = true;
-            return false;
-               
+            return false;               
         }
     }
 

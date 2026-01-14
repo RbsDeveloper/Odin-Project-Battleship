@@ -1,28 +1,7 @@
-import { getBoards, extractShipDetails } from "./gameController.js";
 import { createCompleteElement } from "./utils.js";
-/*
-    UI components needed before the main game screen:
 
-    1. Start Dialog
-        - Button to start the game
-
-    2. Game Settings Dialog
-        - Select opponent type (computer or another player)
-        - Enter player name
-        - Optional: enter second player’s name (if PvP)
-        - Next button to continue to ship placement
-
-    3. Ship Placement Dialog
-        - Ship selection interface (drag and drop or select)
-        - Buttons for:
-            - Random placement
-            - Reset placement
-            - Change orientation
-        - Grid to place each ship
-        - Button to save placements and start the game
-*/
-
-const startDialog = () => {
+//FUNCTION THAT CREATES THE START GAME DIALOG
+export const startDialog = () => {
     const dialogEl = createCompleteElement("dialog", ["startingDialog"], "", {id: "startingWindow"});
     const gameTitle = createCompleteElement("h1", ["gameTitle"], "Battleship");
     const startGameBtn = createCompleteElement('button', ["btn", "startGameBtn"], "Start Game", {id: "sgBtn"});
@@ -32,8 +11,8 @@ const startDialog = () => {
     return dialogEl
 }
 
-const gameSettingsDialog = () => {
-    const dialogEl = createCompleteElement("dialog", ["settingsDialog"], "", {id: "settingsWindow"});
+//FUNCTION THAT CREATES THE SETTINGS GAME DIALOG
+export const insertSettingsForm = () => {
     const formEl = createCompleteElement("form", ["settingsForm"], "", {id: "gameSettingsForm"});
 
     //elements inside the form
@@ -59,12 +38,11 @@ const gameSettingsDialog = () => {
     const submitBtn = createCompleteElement("button", ["btn", "formSubmitBtn"], "Next", {type: "submit"});
 
     formEl.append(gameModeFieldset, fieldSetForNames, submitBtn);
-    dialogEl.append(formEl);
 
-    return dialogEl;
+    return formEl;
 
 }
-//Optional second name input
+//FUNCTION THAT CREATES AND INSERTS THE SECOND NAME INPUT BASED ON THE GAME MODE
 export const createSecondPlayerInput = () => {
     const nameFieldset = document.getElementById("nameFieldset");
 
@@ -73,60 +51,40 @@ export const createSecondPlayerInput = () => {
 
     nameFieldset.append(label, secondNameInput);
 }
-
+//FUNCTION THAT REMOVES THE SECOND NAME INPUT
 export const removeSecondPlayerInput = () => {
      document.getElementById("secondPlayerLabel")?.remove();
      document.getElementById("secondPlayerInput")?.remove();
 }
 
-const createShipPlacementUi = () => {
-    const placementContainer = createCompleteElement("div", ["placementContainer"], "", {id: "placementModule"});
-    const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {id: "fleetSelector"});
-    const placementControls = createCompleteElement("div", ["btnContainer"]);
-
-    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "Horizontal", {id: "shipPlacementBtn"});
-    const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement", {id: "randomBtn"});
-    const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
-    const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement", {id: "confirmBtn"});
-
-    placementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn, confirmPlacementBtn);
-    placementContainer.append(fleetSelector, placementControls);
-
-    buildShip(extractShipDetails());
-
-    return placementContainer
-}
-
-const renderGameScreen = () => {
+//FUNCTION THAT CREATES THE GAME SCREEN OR ARENA
+export const renderGameScreen = () => {
     const mainContainer = createCompleteElement("main", [], "",);
 
-    const leftFleetContainer = createCompleteElement("div", ["playerFleetContainer"],);
+    const leftFleetContainer = createCompleteElement("div", ["playerFleetContainer"], "", {id: "leftFleet"});
     const middleContainer = createCompleteElement("div", ["gameboardsContainer"], "", {id: "boardsArea"})
-    const rightFleetContainer = createCompleteElement("div", ["opponentFleetContainer"]);
+    const rightFleetContainer = createCompleteElement("div", ["opponentFleetContainer"],"", {id: "rightFleet"});
 
-    leftFleetContainer.append(createShipPlacementUi());
-    rightFleetContainer.append(createShipPlacementUi())
-
+    // leftFleetContainer.append(createShipPlacementUi());
+    // rightFleetContainer.append(createShipPlacementUi());
+    
     mainContainer.append(leftFleetContainer, middleContainer, rightFleetContainer);
 
     return mainContainer
 }
 
-const playerBoardsArea = () => {
+const createPlayerBoardsArea = (boardsData) => {
     const boardsDestination = document.getElementById("boardsArea");
-    const boardsData = getBoards();
     
     boardsData.forEach(playerGrid => {
         boardsDestination.append(renderGameboard(playerGrid));
     });
-    
-    return main
 }
 
 const renderGameboard = (grid) => {
 
     const boardContainer = createCompleteElement('div', ['board'], '', {'data-player-id': grid.id})
-    
+    /*
     boardContainer.addEventListener('click', (e) => {
         if(!e.target.classList.contains('cell')) return 
 
@@ -137,13 +95,13 @@ const renderGameboard = (grid) => {
         const playerId = boardContainer.dataset.playerId
 
         return console.log({row, col, playerId})
-    })
+    })*/
 
     createCells(boardContainer, grid.grid);
 
     return boardContainer;
 }
-
+//HELPER FUNCTION THAT CREATES THE CELL OF EACH GAMEBOARD
 const createCells = (container, board) => {
     for(let i = 0 ; i < board.length; i++){
 
@@ -158,8 +116,7 @@ const createCells = (container, board) => {
     }
 }
 
-const buildShip = (shipDetails) => {
-    const destination = document.getElementById("fleetSelector");
+export const buildShip = (shipDetails, destination) => {
 
     shipDetails.forEach(item => {
         const build = createCompleteElement("div", ["ship"], `${item.id}`, {id: `${item.id}`});
@@ -167,9 +124,25 @@ const buildShip = (shipDetails) => {
     })   
 }
 
+const createShipPlacementUi = (identityParam) => {
+    const placementContainer = createCompleteElement("div", ["placementContainer"]);
+    const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {"data-player-id": `${identityParam}`});
+    const placementControls = createCompleteElement("div", ["btnContainer"], "", {"data-player-id": `${identityParam}`});
+
+    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "Horizontal");
+    const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement");
+    const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
+    const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement");
+
+    placementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn, confirmPlacementBtn);
+    placementContainer.append(fleetSelector, placementControls);
+
+    return placementContainer
+}
+
 export const layoutFunctions = () => {
 
-    return {startDialog , gameSettingsDialog, createSecondPlayerInput, removeSecondPlayerInput }
+    return {startDialog , insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, renderGameboard, createPlayerBoardsArea, createShipPlacementUi, buildShip }
 }
 
 
