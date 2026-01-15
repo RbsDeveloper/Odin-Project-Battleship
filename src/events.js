@@ -1,4 +1,4 @@
-import { gameState, triggerPhase } from "./gameController.js";
+import { gameState, selectShip, triggerPhase } from "./gameController.js";
 
 export function attachStartBtnLister (element) {
     
@@ -16,5 +16,14 @@ export function attachFormEventListener (element, elementToRemove) {
         elementToRemove.remove();
         gameState.settings = Object.fromEntries(formData);
         triggerPhase("placement");
+    })
+}
+
+export function attachActiveShipEventListener (element) {
+    element.addEventListener("click", (event) => {
+    
+        const targetedShip = event.target.id
+        console.log(targetedShip)
+        selectShip(targetedShip);
     })
 }

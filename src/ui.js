@@ -64,9 +64,6 @@ export function renderGameScreen () {
     const leftFleetContainer = createCompleteElement("div", ["playerFleetContainer"], "", {id: "leftFleet"});
     const middleContainer = createCompleteElement("div", ["gameboardsContainer"], "", {id: "boardsArea"})
     const rightFleetContainer = createCompleteElement("div", ["opponentFleetContainer"],"", {id: "rightFleet"});
-
-    // leftFleetContainer.append(createShipPlacementUi());
-    // rightFleetContainer.append(createShipPlacementUi());
     
     mainContainer.append(leftFleetContainer, middleContainer, rightFleetContainer);
 
@@ -127,6 +124,13 @@ function createCells (container, board) {
         }
 
     }
+}
+
+export function toggleActiveClassOnShips(newActive, oldShip = null) {
+    if (oldShip) {
+        document.getElementById(oldShip).classList.remove("active");
+    }
+    document.getElementById(newActive).classList.add("active");
 }
 
 

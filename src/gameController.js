@@ -1,6 +1,6 @@
 import { Player } from "./Player.js";
-import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi } from "./ui.js";
-import { attachFormEventListener, attachStartBtnLister } from "./events.js";
+import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, toggleActiveClassOnShips } from "./ui.js";
+import { attachActiveShipEventListener, attachFormEventListener, attachStartBtnLister } from "./events.js";
 
 export const gameState = {
     players : [],
@@ -8,6 +8,7 @@ export const gameState = {
     gamePhase: null,
     currentPLayer: 0,
     settings: null,
+    activeShip: null,
 }
 
 export function triggerPhase(phase) {
@@ -42,10 +43,64 @@ const enterSettingsPhase = () => {
 
 const enterPlacementPhase = () => {
     createPlayers(gameState.settings)
-    renderPlacementUi()
+    setUpPlacementPhaseUi()
+    //Just for tests 
+    const shipContainer = document.querySelector(".shipContainer");
+    attachActiveShipEventListener(shipContainer)
 }
 
-export function getBoards () {
+export function selectShip (shipId) {
+    const previousShip = gameState.activeShip && gameState.activeShip !== shipId ? gameState.activeShip : null;
+    
+    const shipEl = document.getElementById(shipId);
+    if(!shipEl || !shipEl.classList.contains('ship')) return
+        toggleActiveClassOnShips(shipId, previousShip);
+        gameState.activeShip = shipId;
+        
+}
+
+/*PLACEMENT LOGIC
+
+    create an eventListener over the ship container
+    it will check the e.target. 
+    it checks the state first to see if there is another active ship
+      if there isn't: 
+        it sets the clicked ship to active in the state
+        it will add an active data attribute
+        it will add an activ class.
+      if there is: 
+        it will remove the data attribute of the active class
+        it will remove also the class 
+        it will change the activeship state
+        and will add to the new one the class etc. 
+
+
+*/
+
+function setUpPlacementPhaseUi () {
+    //we create the player instances
+    const boardsInfo = getBoards();
+    //we append the general layout and the boards for both players
+    document.body.append(renderGameScreen());
+    createPlayerBoardsArea(boardsInfo);
+    //we populate the fleetContainers now
+    
+    const leftFleet = document.getElementById("leftFleet");
+    const rightFleet = document.getElementById("rightFleet");
+    
+    leftFleet.append(createShipPlacementUi(gameState.players[0].id));
+    const leftFleetSelector = document.querySelector(`.shipContainer[data-player-id = '${gameState.players[0].id}']`);
+    
+    buildShip(gameState.players[0].gameboard.shipDetailsForCreation, leftFleetSelector);
+
+    if(gameState.settings.mode === 'pvp'){
+        rightFleet.append(createShipPlacementUi(gameState.players[1].id));
+        const rightFleetSelector = document.querySelector(`.shipContainer[data-player-id = "${gameState.players[1].id}"]`);
+        buildShip(gameState.players[1].gameboard.shipDetailsForCreation, rightFleetSelector); 
+    }
+}
+
+function getBoards () {
 
     const boards = gameState.players.map(player => ({
         id : player.id,
@@ -55,8 +110,7 @@ export function getBoards () {
 
     return boards;
 }
-
-//HELPER FUNCTIONS 
+ 
 const createPlayers = (settings) => {
     const firstPlayer = new Player("human", settings.firstPlayerName);
     let secondPlayer;
@@ -83,27 +137,4 @@ function toggleSecondPlayerInput () {
             removeSecondPlayerInput()
         }
     })
-}
-
-function renderPlacementUi () {
-    //we create the player instances
-    const boardsInfo = getBoards();
-    //we append the general layout and the boards for both players
-    document.body.append(renderGameScreen());
-    createPlayerBoardsArea(boardsInfo);
-    //we populate the fleetContainers now
-    
-    const leftFleet = document.getElementById("leftFleet");
-    const rightFleet = document.getElementById("rightFleet");
-    
-    leftFleet.append(createShipPlacementUi(gameState.players[0].id));
-    const leftFleetSelector = document.querySelector(`.shipContainer[data-player-id = '${gameState.players[0].id}']`);
-    
-    buildShip(gameState.players[1].gameboard.shipDetailsForCreation, leftFleetSelector);
-
-    if(dataFromForm.mode === 'pvp'){
-        rightFleet.append(createShipPlacementUi(gameState.players[1].id));
-        const rightFleetSelector = document.querySelector(`.shipContainer[data-player-id = "${gameState.players[1].id}"]`);
-        buildShip(gameState.players[1].gameboard.shipDetailsForCreation, rightFleetSelector); 
-    }
 }
