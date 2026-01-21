@@ -1,14 +1,15 @@
 import { Player } from "./Player.js";
-import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, toggleActiveClassOnShips } from "./ui.js";
-import { attachActiveShipEventListener, attachFormEventListener, attachStartBtnLister } from "./events.js";
+import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced } from "./ui.js";
+import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachStartBtnLister } from "./events.js";
 
 export const gameState = {
     players : [],
     mode: null,
     gamePhase: null,
-    currentPLayer: 0,
+    currentPlayer: 0,
     settings: null,
     activeShip: null,
+    shipDirection: "horizontal"
 }
 
 export function triggerPhase(phase) {
@@ -47,6 +48,8 @@ const enterPlacementPhase = () => {
     //Just for tests 
     const shipContainer = document.querySelector(".shipContainer");
     attachActiveShipEventListener(shipContainer)
+    const playerBoard = document.querySelector(`.board[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
+    attachBoardEventListener(playerBoard)
 }
 
 export function selectShip (shipId) {
@@ -56,26 +59,7 @@ export function selectShip (shipId) {
     if(!shipEl || !shipEl.classList.contains('ship')) return
         toggleActiveClassOnShips(shipId, previousShip);
         gameState.activeShip = shipId;
-        
 }
-
-/*PLACEMENT LOGIC
-
-    create an eventListener over the ship container
-    it will check the e.target. 
-    it checks the state first to see if there is another active ship
-      if there isn't: 
-        it sets the clicked ship to active in the state
-        it will add an active data attribute
-        it will add an activ class.
-      if there is: 
-        it will remove the data attribute of the active class
-        it will remove also the class 
-        it will change the activeship state
-        and will add to the new one the class etc. 
-
-
-*/
 
 function setUpPlacementPhaseUi () {
     //we create the player instances
@@ -137,4 +121,29 @@ function toggleSecondPlayerInput () {
             removeSecondPlayerInput()
         }
     })
+}
+
+export function tryPlaceActiveShip (row, col) {
+    const player = gameState.players[gameState.currentPlayer];
+    const shipReference = getActiveShipFromPlayerFleet(player);
+
+    try{    
+        console.log(shipReference, gameState.shipDirection, [row, col])
+        const placedCoords = player.gameboard.placeShip(shipReference, gameState.shipDirection, [row, col]);
+        markCellsOccupied( player.id , placedCoords)
+        if(placedCoords){
+            markShipAsPlaced(gameState.activeShip);
+            gameState.activeShip = null;
+        }
+        console.log(player.gameboard.grid);
+    }catch (error){
+        console.warn(error.message)
+    }
+}
+
+function getActiveShipFromPlayerFleet (player) {
+    const shipId = gameState.activeShip;
+    if(!shipId) return null;
+
+    return player.gameboard.fleet.find(ship => ship.id === shipId);
 }

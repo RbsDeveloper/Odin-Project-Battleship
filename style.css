@@ -57,3 +57,12 @@ main {
 .active {
     background-color: green;
 }
+
+.ship-placed {
+    background-color: green;
+}
+
+.placed {
+    pointer-events: none;
+    opacity: 0.5;
+}

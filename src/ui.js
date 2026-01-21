@@ -133,7 +133,19 @@ export function toggleActiveClassOnShips(newActive, oldShip = null) {
     document.getElementById(newActive).classList.add("active");
 }
 
+export function markCellsOccupied (playerId, coords) {
+    coords.forEach(([r , c]) => {
+        const cell = document.querySelector(`.board[data-player-id = '${playerId}'] .cell[data-row='${r}'][data-col='${c}']`)
+        cell.classList.add("ship-placed");
+    })
+}
 
-
+export function markShipAsPlaced (shipId) {
+    const shipEl = document.getElementById(shipId);
+    if(shipEl){
+        shipEl.classList.add("placed");
+        shipEl.classList.remove("active");
+    }
+}
 
 

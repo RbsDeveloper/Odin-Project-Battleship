@@ -1,4 +1,4 @@
-import { gameState, selectShip, triggerPhase } from "./gameController.js";
+import { gameState, selectShip, triggerPhase, tryPlaceActiveShip } from "./gameController.js";
 
 export function attachStartBtnLister (element) {
     
@@ -25,5 +25,15 @@ export function attachActiveShipEventListener (element) {
         const targetedShip = event.target.id
         console.log(targetedShip)
         selectShip(targetedShip);
+    })
+}
+
+export function attachBoardEventListener (element) {
+    element.addEventListener("click", (event) => {
+        
+        const row = parseInt(event.target.getAttribute("data-row"));
+        const col = parseInt(event.target.getAttribute("data-col"));
+        console.log(row, col)
+        tryPlaceActiveShip(row, col);
     })
 }

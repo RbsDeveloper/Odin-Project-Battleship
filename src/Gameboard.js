@@ -25,12 +25,13 @@ export function Gameboard () {
         isOutOfBounds(ship, cellType);
 
         const coordsForShipPlacement = getCellsForPlacement(ship, direction, [row, col]);
-
+        console.log(`coordForShipPLacement: ${coordsForShipPlacement}`);
         if(!canBePlaced(grid, coordsForShipPlacement)){
             throw new Error("Ship can't be placed: overlapping ship")
         }
-
+        console.log('next is occupy cell func')
         occupyCell(grid, coordsForShipPlacement, ship);
+        return coordsForShipPlacement;
     }
 
     const receiveAttack = ([row, col]) => {
@@ -65,6 +66,7 @@ const isOutOfBounds = (shipObj, cellType) => {
     const lastCellOfShip = cellType + (totalCellOccupied - 1);
 
     if( lastCellOfShip > 9) throw new Error("Ship can't be placed out of the grid")
+
 }
 
 const getCellsForPlacement = (shipObj, direction, [rowCoords, colCoords]) => {
