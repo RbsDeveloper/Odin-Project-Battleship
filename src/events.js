@@ -1,4 +1,4 @@
-import { gameState, selectShip, triggerPhase, tryPlaceActiveShip } from "./gameController.js";
+import { fireActionBasedOnBtnTarget, gameState, selectShip, triggerPhase, tryPlaceActiveShip } from "./gameController.js";
 
 export function attachStartBtnLister (element) {
     
@@ -35,5 +35,18 @@ export function attachBoardEventListener (element) {
         const col = parseInt(event.target.getAttribute("data-col"));
         console.log(row, col)
         tryPlaceActiveShip(row, col);
+    })
+}
+
+export function attachPlacementBtnsEventListener (element) {
+    element.addEventListener("click", (event) => {
+        console.log(event)
+        let target = event.target;
+        if(target.id){
+            console.log("it has an Id");
+            fireActionBasedOnBtnTarget(target.id);
+        }else{
+            console.log("No Id here");
+        }
     })
 }

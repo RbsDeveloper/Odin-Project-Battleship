@@ -1,6 +1,6 @@
 import { Player } from "./Player.js";
 import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced } from "./ui.js";
-import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachStartBtnLister } from "./events.js";
+import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister } from "./events.js";
 
 export const gameState = {
     players : [],
@@ -22,19 +22,19 @@ export function triggerPhase(phase) {
     }
 }
 
-export const initGame = () => {  
+export function initGame () {  
     triggerPhase("start");
     const startBtn = document.getElementById("sgBtn");
     attachStartBtnLister(startBtn);
 }
 
-const enterStartPhase = () => {
+function enterStartPhase () {
     document.body.append(startDialog())
     const modal = document.getElementById("startingWindow");
     modal.show()
 }
 
-const enterSettingsPhase = () => {
+function enterSettingsPhase () {
     const modal = document.getElementById("startingWindow");
     const formElement = insertSettingsForm();
     modal.append(formElement);
@@ -42,14 +42,16 @@ const enterSettingsPhase = () => {
     attachFormEventListener(formElement, modal);
 }
 
-const enterPlacementPhase = () => {
+function enterPlacementPhase () {
     createPlayers(gameState.settings)
     setUpPlacementPhaseUi()
     //Just for tests 
     const shipContainer = document.querySelector(".shipContainer");
     attachActiveShipEventListener(shipContainer)
     const playerBoard = document.querySelector(`.board[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
-    attachBoardEventListener(playerBoard)
+    attachBoardEventListener(playerBoard);
+    const btnsContainer = document.querySelector(`.btnContainer[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
+    attachPlacementBtnsEventListener(btnsContainer);
 }
 
 export function selectShip (shipId) {
@@ -95,7 +97,7 @@ function getBoards () {
     return boards;
 }
  
-const createPlayers = (settings) => {
+function createPlayers (settings) {
     const firstPlayer = new Player("human", settings.firstPlayerName);
     let secondPlayer;
 
@@ -141,9 +143,29 @@ export function tryPlaceActiveShip (row, col) {
     }
 }
 
+export function fireActionBasedOnBtnTarget (targetBtnId) {
+    switch(targetBtnId) {
+        case "shipDirectionBtn": changeShipDirection(); break;
+        case "randomPlacementBtn": placeShipRandom(); break;
+        case "resetBtn": resetPlayerBoard(); break;
+        case "confirmPlacementBtn": confirmShipsPLacement(); break;
+    }
+}
+
 function getActiveShipFromPlayerFleet (player) {
     const shipId = gameState.activeShip;
     if(!shipId) return null;
 
     return player.gameboard.fleet.find(ship => ship.id === shipId);
+}
+
+function changeShipDirection() {
+    const btn = document.querySelector(".directionBtn");
+    if(gameState.shipDirection === 'horizontal'){
+        gameState.shipDirection = 'vertical';
+        btn.innerText = 'vertical'
+    }else{
+        gameState.shipDirection = "horizontal";
+        btn.innerText = "horizontal"
+    }
 }
