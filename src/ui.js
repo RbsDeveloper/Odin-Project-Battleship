@@ -91,10 +91,10 @@ export function createShipPlacementUi  (identityParam) {
     const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {"data-player-id": `${identityParam}`});
     const placementControls = createCompleteElement("div", ["btnContainer"], "", {"data-player-id": `${identityParam}`});
 
-    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "Horizontal");
-    const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement");
+    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "Horizontal", {id: "shipDirectionBtn"});
+    const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement", {id: "randomPlacementBtn"});
     const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
-    const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement");
+    const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement", {id: "confirmPlacementBtn"});
 
     placementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn, confirmPlacementBtn);
     placementContainer.append(fleetSelector, placementControls);
