@@ -21,10 +21,11 @@ export function attachFormEventListener (element, elementToRemove) {
 
 export function attachActiveShipEventListener (element) {
     element.addEventListener("click", (event) => {
-    
-        const targetedShip = event.target.id
-        console.log(targetedShip)
-        selectShip(targetedShip);
+        const targetEl = event.target;
+        if(targetEl.classList.contains("ship")){
+            console.log(event.target)
+            selectShip(targetEl.id);
+        }
     })
 }
 
