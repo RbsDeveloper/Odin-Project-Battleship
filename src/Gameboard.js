@@ -29,7 +29,7 @@ export function Gameboard () {
         if(!canBePlaced(grid, coordsForShipPlacement)){
             throw new Error("Ship can't be placed: overlapping ship")
         }
-        console.log('next is occupy cell func')
+        
         occupyCell(grid, coordsForShipPlacement, ship);
         return coordsForShipPlacement;
     }

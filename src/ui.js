@@ -148,4 +148,17 @@ export function markShipAsPlaced (shipId) {
     }
 }
 
+export function resetBoardUi (playerId, boardsDetails) {
+    const targetBoard = document.querySelector(`.board[data-player-id = '${playerId}']`);
+    targetBoard.innerHTML = "";
+    createCells(targetBoard, boardsDetails);
+}
 
+export function resetFleetUi (playerId) {
+    const shipsContainer = document.querySelector(`.shipContainer[data-player-id = '${playerId}']`)
+    if(!shipsContainer) return;
+
+    [...shipsContainer.children].forEach(ship => {
+         ship.classList.remove("active", "placed");
+    }); 
+}

@@ -1,5 +1,5 @@
 import { Player } from "./Player.js";
-import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced } from "./ui.js";
+import { startDialog, insertSettingsForm, createSecondPlayerInput, removeSecondPlayerInput, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi} from "./ui.js";
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister } from "./events.js";
 
 export const gameState = {
@@ -144,6 +144,8 @@ export function tryPlaceActiveShip (row, col) {
 }
 
 export function fireActionBasedOnBtnTarget (targetBtnId) {
+    if(gameState.gamePhase !== "placement") return;
+
     switch(targetBtnId) {
         case "shipDirectionBtn": changeShipDirection(); break;
         case "randomPlacementBtn": placeShipRandom(); break;
@@ -168,4 +170,14 @@ function changeShipDirection() {
         gameState.shipDirection = "horizontal";
         btn.innerText = "horizontal"
     }
+}
+
+function resetPlayerBoard() {
+    const player = gameState.players[gameState.currentPlayer];
+    player.clearGameboard();
+
+    resetBoardUi(player.id, player.gameboard.grid)
+    resetFleetUi(player.id)
+    
+    gameState.activeShip = null;
 }
