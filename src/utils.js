@@ -15,3 +15,11 @@ export function createCompleteElement (tag, classes = [], text = "", attributes 
 
     return element;
 }
+
+export function getRandomDirection () {
+    return Math.random() < 0.5 ? "horizontal" : "vertical";
+}
+
+export function getRandomCoord (gridSize = 10) {
+    return Math.floor(Math.random() * gridSize);
+}
