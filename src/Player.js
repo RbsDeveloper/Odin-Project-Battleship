@@ -12,5 +12,9 @@ export function Player (type, id) {
         gameboard = Gameboard();
     }
 
-    return {type, id, gameboard, attackEnemy, clearGameboard}
+    const getBoard = () => {
+        return gameboard
+    }
+
+    return {type, id, attackEnemy, clearGameboard, getBoard}
 }
