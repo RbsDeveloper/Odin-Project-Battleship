@@ -1,4 +1,6 @@
-import { fireActionBasedOnBtnTarget, gameState, selectShip, triggerPhase, tryPlaceActiveShip } from "./gameController.js";
+import { gameState } from "./gameState.js";
+import { fireActionBasedOnBtnTarget, triggerPhase } from "./gameController.js";
+import { selectShip, tryPlaceActiveShip } from "./placementController.js";
 
 export function attachStartBtnLister (element) {
     
