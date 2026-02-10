@@ -3,6 +3,7 @@ export class Ship {
         this.length = length;
         this.hits = 0;
         this.id = id;
+        this.isPlaced = false;
     }
 
     hit () {
@@ -11,5 +12,9 @@ export class Ship {
 
     isSunk () {
         return this.hits >= this.length;
+    }
+
+    setPlaced () {
+        this.isPlaced = true;
     }
 }

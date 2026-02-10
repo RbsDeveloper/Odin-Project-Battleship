@@ -19,7 +19,6 @@ export function Gameboard () {
     const fleet = shipDetailsForCreation.map(ship => new Ship(ship.length, ship.id));
 
     const placeShip = (ship, direction = "vertical", [row, col]) => {
-
         const cellType = direction === "vertical" ? row : col;
         
         isOutOfBounds(ship, cellType);
@@ -31,6 +30,7 @@ export function Gameboard () {
         }
         
         occupyCell(grid, coordsForShipPlacement, ship);
+        ship.setPlaced();
         return coordsForShipPlacement;
     }
 
