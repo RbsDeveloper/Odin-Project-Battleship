@@ -1,6 +1,6 @@
 import { gameState } from "./gameState.js";
 import { getRandomCoord, getRandomDirection } from "./utils.js";
-import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi } from "./ui.js";
+import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn } from "./ui.js";
 
 
 
@@ -37,15 +37,14 @@ export function resetPlayerBoard() {
 
     resetBoardUi(player.id, player.getBoard().grid)
     resetFleetUi(player.id)
-    
+    disableConfirmBtn()
     gameState.activeShip = null;
 }
 
-export function tryPlaceActiveShip (row, col) {
+export function attemptShipPlacement (row, col) {
     const player = gameState.players[gameState.currentPlayer];
     const shipReference = getActiveShipFromPlayerFleet(player);
-    console.log(shipReference)
-
+    //console.log(shipReference)
     try{    
         console.log(shipReference, gameState.shipDirection, [row, col])
         const placedCoords = player.getBoard().placeShip(shipReference, gameState.shipDirection, [row, col]);
@@ -60,13 +59,14 @@ export function tryPlaceActiveShip (row, col) {
     }
 }
 
-export function placeFleetRandomly () {
+//Used for the placeRandomFleet BTN
+export function placeFleetRandomlyForCurrentPlayer () {
     resetPlayerBoard()
     const playerFleet = gameState.players[gameState.currentPlayer].getBoard().fleet;
+    const activePlayer = gameState.players[gameState.currentPlayer]
 
     for(const boat of playerFleet){
         let placed = false;
-        const activePlayer = gameState.players[gameState.currentPlayer]
 
         while(placed === false){
             const direction = getRandomDirection()
@@ -89,4 +89,49 @@ export function placeFleetRandomly () {
             }
         }
     }
+    if(isPlacementCompleted(activePlayer)) enableConfirmBtn();
+};
+
+//Used as a random fleet placement for the CPU
+export function placeRandomFleet () {
+    const activePlayer = gameState.players[gameState.currentPlayer]
+    const playerFleet = activePlayer.getBoard().fleet;
+    
+
+    for(const boat of playerFleet){
+        let placed = false;
+        
+
+        while(placed === false){
+            const direction = getRandomDirection()
+            const rowCoord = getRandomCoord();
+            const colCoord = getRandomCoord();
+
+            gameState.activeShip = boat.id;
+            gameState.shipDirection = direction;
+
+            try {
+                const placedCoords = activePlayer.getBoard().placeShip(boat, gameState.shipDirection, [rowCoord, colCoord]);
+                //markCellsOccupied( activePlayer.id , placedCoords)
+                if(placedCoords){
+                    //markShipAsPlaced(gameState.activeShip);
+                    gameState.activeShip = null;
+                }
+                placed = true;
+            }catch (err) { 
+                // invalid placement, try again
+            }
+        }
+    }
+}
+
+export function isPlacementCompleted (player) {
+    const fleetToCheck = player.getBoard().fleet;
+    
+    for(const boat of fleetToCheck){
+        if(boat.isPlaced === false) return false;
+    }
+
+    return true
+
 }
