@@ -70,12 +70,29 @@ export function renderGameScreen () {
     return mainContainer
 }
 
+//creates the boards for both players inside the boardArea, best for the game phase
 export function createPlayerBoardsArea  (boardsData) {
     const boardsDestination = document.getElementById("boardsArea");
     
     boardsData.forEach(playerGrid => {
         boardsDestination.append(renderGameboard(playerGrid));
     });
+}
+
+//creates placement scree
+
+export function renderPlacementScreen () {
+    const mainContainer = createCompleteElement("main", [], "",);
+    const messageContainer = createCompleteElement("div", ["msgContainer"], "", {id: "msgWrapper"});
+    const interactiveArea = createCompleteElement("div", ["interactiveContainer"], "", {id: "interactiveZone"})
+
+    const fleetPlacementContainer = createCompleteElement("div", ["playerFleetContainer"], "", {id: "fleetPlacementControls"});
+    const gridContainer = createCompleteElement("div", ["placementBoardContainer"], "", {id: "placementArea"})
+    const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement", {id: "confirmPlacementBtn", disabled: true});
+    interactiveArea.append(fleetPlacementContainer, gridContainer, confirmPlacementBtn);
+    mainContainer.append(messageContainer, interactiveArea);
+
+    return mainContainer;
 }
 
 export function buildShip (shipDetails, destination) {
@@ -85,7 +102,7 @@ export function buildShip (shipDetails, destination) {
         destination.append(build);
     })   
 }
-
+//creates the container where the ships and btn controlls are stored for placement
 export function createShipPlacementUi  (identityParam) {
     const placementContainer = createCompleteElement("div", ["placementContainer"]);
     const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {"data-player-id": `${identityParam}`});
@@ -94,16 +111,15 @@ export function createShipPlacementUi  (identityParam) {
     const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "Horizontal", {id: "shipDirectionBtn"});
     const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement", {id: "randomPlacementBtn"});
     const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
-    const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement", {id: "confirmPlacementBtn"});
 
-    placementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn, confirmPlacementBtn);
+    placementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn);
     placementContainer.append(fleetSelector, placementControls);
 
     return placementContainer
 }
 
-
-function renderGameboard (grid) {
+//Creates a grid or board
+export function renderGameboard (grid) {
 
     const boardContainer = createCompleteElement('div', ['board'], '', {'data-player-id': grid.id})
 
@@ -161,4 +177,22 @@ export function resetFleetUi (playerId) {
     [...shipsContainer.children].forEach(ship => {
          ship.classList.remove("active", "placed");
     }); 
+}
+
+export function enableConfirmBtn () {
+    const confirmBtn = document.getElementById("confirmPlacementBtn");
+    confirmBtn.disabled = false
+}
+
+export function disableConfirmBtn () {
+    const confirmBtn = document.getElementById("confirmPlacementBtn");
+    if(!confirmBtn.disabled) confirmBtn.disabled = true;
+}
+  
+export function clearPlacementComponents () {
+    const fleetContainer = document.getElementById("fleetPlacementControls");
+    fleetContainer.innerHTML = "";
+    const interactiveBoards = document.getElementById("placementArea");
+    interactiveBoards.innerHTML = ""
+
 }
