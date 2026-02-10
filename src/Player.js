@@ -5,7 +5,7 @@ export function Player (type, id) {
     let gameboard = Gameboard();
 
     const attackEnemy = ([x,y], enemy) => {
-        enemy.gameboard.receiveAttack([x,y])
+        enemy.getBoard().receiveAttack([x,y])
     }
 
     const clearGameboard = () => {

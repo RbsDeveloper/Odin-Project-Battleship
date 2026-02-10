@@ -61,7 +61,7 @@ export function Gameboard () {
     return { grid, fleet, shipDetailsForCreation, placeShip, receiveAttack, areAllShipSunk }
 }
 
-const isOutOfBounds = (shipObj, cellType) => {
+function isOutOfBounds (shipObj, cellType) {
     const totalCellOccupied = shipObj.length
     const lastCellOfShip = cellType + (totalCellOccupied - 1);
 
@@ -69,7 +69,7 @@ const isOutOfBounds = (shipObj, cellType) => {
 
 }
 
-const getCellsForPlacement = (shipObj, direction, [rowCoords, colCoords]) => {
+function getCellsForPlacement (shipObj, direction, [rowCoords, colCoords]) {
 
     let cellsForPlacement = [];
 
@@ -86,7 +86,7 @@ const getCellsForPlacement = (shipObj, direction, [rowCoords, colCoords]) => {
     return cellsForPlacement
 }
 
-const canBePlaced = (gameBoard, shipCoords) => {
+function canBePlaced (gameBoard, shipCoords) {
     for(let i = 0; i < shipCoords.length; i++){
         if(gameBoard[shipCoords[i][0]][shipCoords[i][1]].hasShip === true){
             return false
@@ -95,7 +95,7 @@ const canBePlaced = (gameBoard, shipCoords) => {
     return true
 }
 
-const occupyCell = (gameBoard, shipCoords, shipObj) => {
+function occupyCell (gameBoard, shipCoords, shipObj) {
     for(let i = 0; i < shipCoords.length; i++){
         gameBoard[shipCoords[i][0]][shipCoords[i][1]].hasShip = true;
         gameBoard[shipCoords[i][0]][shipCoords[i][1]].shipReference = shipObj;
