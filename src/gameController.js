@@ -1,7 +1,7 @@
-import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi } from "./ui.js";
-import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister } from "./events.js";
+import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard } from "./ui.js";
+import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, proceedToSecondPlayerPlacement, enterGamePhaseForPvC } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
-import { placeFleetRandomly, resetPlayerBoard, changeShipDirection } from "./placementController.js";
+import { placeFleetRandomlyForCurrentPlayer, resetPlayerBoard, changeShipDirection } from "./placementController.js";
 import { gameState, getBoards } from "./gameState.js";
 
 export function triggerPhase(phase) {
@@ -35,38 +35,25 @@ function enterSettingsPhase () {
 }
 
 function enterPlacementPhase () {
-    createPlayers(gameState.settings)
-    setUpPlacementPhaseUi()
-    //Just for tests 
-    const shipContainer = document.querySelector(".shipContainer");
-    attachActiveShipEventListener(shipContainer)
-    const playerBoard = document.querySelector(`.board[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
-    attachBoardEventListener(playerBoard);
-    const btnsContainer = document.querySelector(`.btnContainer[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
-    attachPlacementBtnsEventListener(btnsContainer);
+    createPlayers(gameState.settings);
+    document.body.append(renderPlacementScreen());
+    initializePlacementUI()
+    
+    const confirmBtn = document.getElementById("confirmPlacementBtn");
+
+    if(gameState.settings.mode === "pvp"){
+        proceedToSecondPlayerPlacement(confirmBtn);
+    }else{
+        enterGamePhaseForPvC(confirmBtn)
+    }
 }
 
-function setUpPlacementPhaseUi () {
-    //we create the player instances
-    const boardsInfo = getBoards();
-    //we append the general layout and the boards for both players
-    document.body.append(renderGameScreen());
-    createPlayerBoardsArea(boardsInfo);
-    //we populate the fleetContainers now
-    
-    const leftFleet = document.getElementById("leftFleet");
-    const rightFleet = document.getElementById("rightFleet");
-    
-    leftFleet.append(createShipPlacementUi(gameState.players[0].id));
-    const leftFleetSelector = document.querySelector(`.shipContainer[data-player-id = '${gameState.players[0].id}']`);
-    
-    buildShip(gameState.players[0].getBoard().shipDetailsForCreation, leftFleetSelector);
-
-    if(gameState.settings.mode === 'pvp'){
-        rightFleet.append(createShipPlacementUi(gameState.players[1].id));
-        const rightFleetSelector = document.querySelector(`.shipContainer[data-player-id = "${gameState.players[1].id}"]`);
-        buildShip(gameState.players[1].getBoard().shipDetailsForCreation, rightFleetSelector); 
-    }
+export function initializePlacementUI () {
+    const fleetContainer = document.getElementById("fleetPlacementControls");
+    fleetContainer.append(createShipPlacementUi(gameState.players[gameState.currentPlayer].id));
+    const fleetContainerSelector = document.querySelector(`.shipContainer[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
+    buildShip(gameState.players[gameState.currentPlayer].getBoard().shipDetailsForCreation, fleetContainerSelector);
+    loadPlacementContainer();     
 }
 
 export function fireActionBasedOnBtnTarget (targetBtnId) {
@@ -74,9 +61,21 @@ export function fireActionBasedOnBtnTarget (targetBtnId) {
 
     switch(targetBtnId) {
         case "shipDirectionBtn": changeShipDirection(); break;
-        case "randomPlacementBtn": placeFleetRandomly(); break;
+        case "randomPlacementBtn": placeFleetRandomlyForCurrentPlayer(); break;
         case "resetBtn": resetPlayerBoard(); break;
-        //case "confirmPlacementBtn": confirmShipsPLacement(); break;
+        
     }
+}
+
+function loadPlacementContainer () {
+    const interactiveBoard = document.getElementById("placementArea");
+    const playerBoards = getBoards();
+    interactiveBoard.append(renderGameboard(playerBoards[gameState.currentPlayer]));
+    const shipContainer = document.querySelector(".shipContainer");
+    attachActiveShipEventListener(shipContainer)
+    const playerBoard = document.querySelector(`.board[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
+    attachBoardEventListener(playerBoard);
+    const btnsContainer = document.querySelector(`.btnContainer[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
+    attachPlacementBtnsEventListener(btnsContainer);
 }
 
