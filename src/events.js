@@ -1,6 +1,7 @@
 import { gameState } from "./gameState.js";
-import { fireActionBasedOnBtnTarget, triggerPhase } from "./gameController.js";
-import { selectShip, tryPlaceActiveShip } from "./placementController.js";
+import { fireActionBasedOnBtnTarget, initializePlacementUI, triggerPhase } from "./gameController.js";
+import { isPlacementCompleted, selectShip, placeRandomFleet, attemptShipPlacement } from "./placementController.js";
+import { clearPlacementComponents, disableConfirmBtn, enableConfirmBtn, renderGameScreen } from "./ui.js";
 
 export function attachStartBtnLister (element) {
     
@@ -37,7 +38,8 @@ export function attachBoardEventListener (element) {
         const row = parseInt(event.target.getAttribute("data-row"));
         const col = parseInt(event.target.getAttribute("data-col"));
         console.log(row, col)
-        tryPlaceActiveShip(row, col);
+        attemptShipPlacement(row, col);
+        if(isPlacementCompleted(gameState.players[gameState.currentPlayer])) enableConfirmBtn();
     })
 }
 
@@ -53,3 +55,31 @@ export function attachPlacementBtnsEventListener (element) {
         }
     })
 }
+
+export function proceedToSecondPlayerPlacement (element) {
+    element.addEventListener("click", ()=> {
+        console.log("clicked")
+        gameState.currentPlayer = 1;
+        disableConfirmBtn()
+        clearPlacementComponents()
+        initializePlacementUI()
+        enterGamePhaseForPvP(element)
+    },
+{once: true})
+}
+
+function enterGamePhaseForPvP (element) {
+    element.addEventListener("click", ()=> {
+        document.body.innerHTML = "";
+        document.body.append(renderGameScreen());
+    })
+}
+
+export function enterGamePhaseForPvC (element) {
+    element.addEventListener("click", ()=> {
+        gameState.currentPlayer = 1;
+        placeRandomFleet();
+        document.body.innerHTML = "";
+    })
+}
+
