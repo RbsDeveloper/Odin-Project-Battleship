@@ -39,14 +39,14 @@ export function Gameboard () {
             if(!grid[row][col].isHit){
                 grid[row][col].shipReference.hit();
                 grid[row][col].isHit = true;
-                return true;
+                return 'hit';
             }else{
-                throw new Error("Cell allready hit")
+                return null
             }            
         }else{
-            if(grid[row][col].isHit === true) throw new Error("Cell allready hit") 
+            if(grid[row][col].isHit === true) return null 
             grid[row][col].isHit = true;
-            return false;               
+            return 'miss';               
         }
     }
 
