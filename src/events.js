@@ -1,5 +1,5 @@
 import { gameState } from "./gameState.js";
-import { fireActionBasedOnBtnTarget, initializePlacementUI, triggerPhase } from "./gameController.js";
+import { fireActionBasedOnBtnTarget, initializePlacementUI, runRound, triggerPhase } from "./gameController.js";
 import { isPlacementCompleted, selectShip, placeRandomFleet, attemptShipPlacement } from "./placementController.js";
 import { clearPlacementComponents, disableConfirmBtn, enableConfirmBtn, renderGameScreen } from "./ui.js";
 
@@ -70,8 +70,7 @@ export function proceedToSecondPlayerPlacement (element) {
 
 function enterGamePhaseForPvP (element) {
     element.addEventListener("click", ()=> {
-        document.body.innerHTML = "";
-        document.body.append(renderGameScreen());
+        triggerPhase("game");
     })
 }
 
@@ -79,7 +78,12 @@ export function enterGamePhaseForPvC (element) {
     element.addEventListener("click", ()=> {
         gameState.currentPlayer = 1;
         placeRandomFleet();
-        document.body.innerHTML = "";
+        triggerPhase("game");
     })
 }
 
+export function attachComputerBoardClicks (element) {
+    element.addEventListener("click", (e) => {
+        runRound(e.target)
+    })
+}
