@@ -1,4 +1,5 @@
-import { createCompleteElement } from "./utils.js";
+import { gameState } from "./gameState.js";
+import { createCompleteElement, getOpponentIdxForBoardMarking } from "./utils.js";
 
 //FUNCTION THAT CREATES THE START GAME DIALOG
 export function startDialog () {
@@ -61,9 +62,9 @@ export function removeSecondPlayerInput () {
 export function renderGameScreen () {
     const mainContainer = createCompleteElement("main", [], "",);
 
-    const leftFleetContainer = createCompleteElement("div", ["playerFleetContainer"], "", {id: "leftFleet"});
+    const leftFleetContainer = createCompleteElement("div", ["fleetContainer"], "", {id: "leftFleet"});
     const middleContainer = createCompleteElement("div", ["gameboardsContainer"], "", {id: "boardsArea"})
-    const rightFleetContainer = createCompleteElement("div", ["opponentFleetContainer"],"", {id: "rightFleet"});
+    const rightFleetContainer = createCompleteElement("div", ["fleetContainer"],"", {id: "rightFleet"});
     
     mainContainer.append(leftFleetContainer, middleContainer, rightFleetContainer);
 
@@ -86,7 +87,7 @@ export function renderPlacementScreen () {
     const messageContainer = createCompleteElement("div", ["msgContainer"], "", {id: "msgWrapper"});
     const interactiveArea = createCompleteElement("div", ["interactiveContainer"], "", {id: "interactiveZone"})
 
-    const fleetPlacementContainer = createCompleteElement("div", ["playerFleetContainer"], "", {id: "fleetPlacementControls"});
+    const fleetPlacementContainer = createCompleteElement("div", ["fleetContainer"], "", {id: "fleetPlacementControls"});
     const gridContainer = createCompleteElement("div", ["placementBoardContainer"], "", {id: "placementArea"})
     const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement", {id: "confirmPlacementBtn", disabled: true});
     interactiveArea.append(fleetPlacementContainer, gridContainer, confirmPlacementBtn);
@@ -195,4 +196,13 @@ export function clearPlacementComponents () {
     const interactiveBoards = document.getElementById("placementArea");
     interactiveBoards.innerHTML = ""
 
+}
+
+export function markCellAsHit (attackResult, cell) {
+
+    if(attackResult === "hit") {
+        cell.classList.add("hit");
+    }else if(attackResult === 'miss'){
+        cell.classList.add("miss");
+    }
 }
