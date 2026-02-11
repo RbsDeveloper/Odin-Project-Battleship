@@ -35,7 +35,7 @@ main {
     background-color: white;
 }
 
-.playerFleetContainer {
+.fleetContainer {
     border: 2px solid black;
     border-radius: 1rem;
     padding: 20px;
@@ -69,4 +69,12 @@ main {
 
 .interactiveContainer {
     display: flex;
+}
+
+.hit{
+    background-color: red;
+}
+
+.miss {
+    background-color: blue;
 }
