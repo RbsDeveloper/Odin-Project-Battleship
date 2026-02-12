@@ -1,9 +1,9 @@
 import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit } from "./ui.js";
-import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, proceedToSecondPlayerPlacement, enterGamePhaseForPvC, attachComputerBoardClicks } from "./events.js";
+import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, proceedToSecondPlayerPlacement, enterGamePhaseForPvC, attachComputerBoardClicks, attachEventForPvpMatch } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { placeFleetRandomlyForCurrentPlayer, resetPlayerBoard, changeShipDirection } from "./placementController.js";
 import { gameState, getBoards } from "./gameState.js";
-import { getRandomCoord } from "./utils.js";
+import { getRandomCoord, opponentIndex } from "./utils.js";
 
 export function triggerPhase(phase) {
     gameState.gamePhase = phase;
@@ -60,7 +60,7 @@ function enterGamePhase () {
     if(gameState.settings.mode === 'pvc'){
         singlePlayerMatch()
     }else{
-
+        pvpMatch()
     }
 }
 
@@ -135,4 +135,34 @@ function computerAttack () {
     }
     gameState.currentPlayer = 0;
     
+}
+
+function pvpMatch () {
+    const boardsContainer = document.getElementById("boardsArea");
+    attachEventForPvpMatch(boardsContainer);
+}
+
+export function pvpRound (eventData) {
+    const activePlayer = gameState.players[gameState.currentPlayer];
+    const targetedBoard = eventData.parentElement
+    
+    if(targetedBoard.getAttribute("data-player-id") === activePlayer.id){
+        console.log('wrong board');
+        return
+    }
+
+    const row = parseInt(eventData.getAttribute("data-row"));
+    const col = parseInt(eventData.getAttribute("data-col"));
+    const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)]
+
+    const hitOrNot = opponentPlayer.getBoard().receiveAttack([row, col]);
+    console.log(hitOrNot)
+    if(hitOrNot === null){ 
+        console.log('hit the same cell')    
+        return 
+    }
+    
+    //const cellElementTargeted = targetedBoard.querySelector(`.cell[data-row = "${row}"][data-col = "${col}"]`);
+    markCellAsHit(hitOrNot, eventData);
+    gameState.currentPlayer = opponentIndex(gameState.currentPlayer)
 }
