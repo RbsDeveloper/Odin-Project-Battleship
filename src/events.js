@@ -1,5 +1,5 @@
 import { gameState } from "./gameState.js";
-import { fireActionBasedOnBtnTarget, initializePlacementUI, runRound, triggerPhase } from "./gameController.js";
+import { fireActionBasedOnBtnTarget, initializePlacementUI, pvpRound, runRound, triggerPhase } from "./gameController.js";
 import { isPlacementCompleted, selectShip, placeRandomFleet, attemptShipPlacement } from "./placementController.js";
 import { clearPlacementComponents, disableConfirmBtn, enableConfirmBtn, renderGameScreen } from "./ui.js";
 
@@ -85,5 +85,12 @@ export function enterGamePhaseForPvC (element) {
 export function attachComputerBoardClicks (element) {
     element.addEventListener("click", (e) => {
         runRound(e.target)
+    })
+}
+
+export function attachEventForPvpMatch (element) {
+    element.addEventListener("click", (event) => {
+        console.log(event.target);
+        pvpRound(event.target);
     })
 }
