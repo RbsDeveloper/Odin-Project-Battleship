@@ -7,11 +7,11 @@ export function createPlayers (settings) {
     let secondPlayer;
 
     if(settings.mode === "pvp"){
-        secondPlayer = new Player("human", settings.seconPlayerName);
+        secondPlayer = new Player("human", settings.secondPlayerName);
     }else{
-        secondPlayer = new Player("computer", "Computer");
+        secondPlayer = new Player("computer", "computer");
     }
-
+    
     gameState.players = [firstPlayer, secondPlayer];
 }
 

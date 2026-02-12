@@ -1,5 +1,5 @@
 import { gameState } from "./gameState.js";
-import { createCompleteElement, getOpponentIdxForBoardMarking } from "./utils.js";
+import { createCompleteElement } from "./utils.js";
 
 //FUNCTION THAT CREATES THE START GAME DIALOG
 export function startDialog () {
@@ -48,7 +48,7 @@ export function createSecondPlayerInput () {
     const nameFieldset = document.getElementById("nameFieldset");
 
     const label = createCompleteElement("label", [], "Second player name:", {id: "secondPlayerLabel", for: "secondPlayerInput"});
-    const secondNameInput = createCompleteElement("input", [], "", {type: "text", id:"secondPlayerInput", name: "secondPlayerInput",})
+    const secondNameInput = createCompleteElement("input", [], "", {type: "text", id:"secondPlayerInput", name: "secondPlayerName",})
     secondNameInput.required = true;
     nameFieldset.append(label, secondNameInput);
 }
