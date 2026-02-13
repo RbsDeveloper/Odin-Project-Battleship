@@ -1,7 +1,7 @@
-import { gameState } from "./gameState.js";
-import { fireActionBasedOnBtnTarget, initializePlacementUI, pvpRound, runRound, triggerPhase } from "./gameController.js";
+import { gameState, resetEntireGameState, resetGameStateForReplay } from "./gameState.js";
+import { fireActionBasedOnBtnTarget, initGame, initializePlacementUI, pvpRound, runRound, triggerPhase } from "./gameController.js";
 import { isPlacementCompleted, selectShip, placeRandomFleet, attemptShipPlacement } from "./placementController.js";
-import { clearPlacementComponents, disableConfirmBtn, enableConfirmBtn, renderGameScreen } from "./ui.js";
+import { clearPlacementComponents, clearWindow, disableConfirmBtn, enableConfirmBtn, renderGameScreen } from "./ui.js";
 
 export function attachStartBtnLister (element) {
     
@@ -92,5 +92,21 @@ export function attachEventForPvpMatch (element) {
     element.addEventListener("click", (event) => {
         console.log(event.target);
         pvpRound(event.target);
+    })
+}
+
+export function attachEventForNewGamebtn (element) {
+    element.addEventListener("click", () => {
+        clearWindow();
+        resetEntireGameState()
+        initGame()
+    })
+}
+
+export function attachEventForPlayAgainBtn (element) {
+    element.addEventListener("click", () => {
+        clearWindow();
+        resetGameStateForReplay();
+        triggerPhase("placement")
     })
 }
