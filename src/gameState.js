@@ -18,3 +18,21 @@ export function getBoards () {
 
     return boards;
 }
+
+export function resetEntireGameState () {
+    gameState.players = [];
+    gameState.mode = null;
+    gameState.gamePhase = null;
+    gameState.currentPlayer = 0;
+    gameState.settings = null;
+    gameState.activeShip = null;
+    gameState.shipDirection= "horizontal";
+}
+
+export function resetGameStateForReplay () {
+    gameState.players = [];
+    gameState.currentPlayer = 0;
+    gameState.activeShip = null;
+    gameState.shipDirection = 'horizontal';
+}
+

@@ -218,3 +218,7 @@ export function renderWinnerDialog (winnerPlayer) {
 
     return winnerDialog;
 }
+
+export function clearWindow () {
+    document.body.innerHTML = "";
+}
