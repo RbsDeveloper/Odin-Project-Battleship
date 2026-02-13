@@ -119,7 +119,6 @@ export function createShipPlacementUi  (identityParam) {
     return placementContainer
 }
 
-//Creates a grid or board
 export function renderGameboard (grid) {
 
     const boardContainer = createCompleteElement('div', ['board'], '', {'data-player-id': grid.id})
@@ -205,4 +204,17 @@ export function markCellAsHit (attackResult, cell) {
     }else if(attackResult === 'miss'){
         cell.classList.add("miss");
     }
+}
+
+export function renderWinnerDialog (winnerPlayer) {
+    const winnerDialog = createCompleteElement("dialog", ["winnerDialog"], `The winner is: ${winnerPlayer}`, {id: "winnerDialog"});
+    const winnerParagraph = createCompleteElement("p", ["winnerMessage"], "", {id:"winnerMessage"});
+    const actions = createCompleteElement("div", ["restartBtnsContainer"], "");
+    const samePlayersRestart = createCompleteElement("button", ["btn", "samePlayersRestart"], "Play Again(same players)", {id: "restartSamePlayers"});
+    const newGame = createCompleteElement("button", ["btn", "newGameBtn"], "Start New Game", {id:"startNewGame"});
+
+    actions.append(newGame, samePlayersRestart);
+    winnerDialog.append(winnerParagraph, actions);
+
+    return winnerDialog;
 }
