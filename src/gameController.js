@@ -3,7 +3,7 @@ import { attachActiveShipEventListener, attachBoardEventListener, attachFormEven
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { placeFleetRandomlyForCurrentPlayer, resetPlayerBoard, changeShipDirection } from "./placementController.js";
 import { gameState, getBoards } from "./gameState.js";
-import { getRandomCoord, opponentIndex } from "./utils.js";
+import { delayActions, getRandomCoord, opponentIndex } from "./utils.js";
 
 export function triggerPhase(phase) {
     gameState.gamePhase = phase;
@@ -102,7 +102,7 @@ function singlePlayerMatch () {
     attachComputerBoardClicks(computerBoard);
 }
 
-export function runRound (eventData) {
+export async function runRound (eventData) {
 
     const row = parseInt(eventData.getAttribute("data-row"));
     const col = parseInt(eventData.getAttribute("data-col"));
@@ -110,8 +110,10 @@ export function runRound (eventData) {
     
     const hitOrNot = opponentPlayer.getBoard().receiveAttack([row, col]);
     if(hitOrNot === null) return
-    markCellAsHit(hitOrNot, eventData);
-
+    await delayActions(1000).then(()=>{
+        markCellAsHit(hitOrNot, eventData);    
+    })
+    
     if(checkLoss(opponentPlayer)){
         triggerPhase("winner");
         return
@@ -122,7 +124,7 @@ export function runRound (eventData) {
    
 }
  
-function computerAttack () {
+async function computerAttack () {
     const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
     const humanBoard = document.querySelector(`.board[data-player-id = "${opponentPlayer.id}"]`)
     let hitOrNot = null
@@ -138,7 +140,10 @@ function computerAttack () {
         }
             
         const targetCell = humanBoard.querySelector(`.cell[data-row = "${rowTarget}"][data-col = "${colTarget}"]`)
-        markCellAsHit(hitOrNot, targetCell)
+       
+        await delayActions(1000).then(()=> {
+            markCellAsHit(hitOrNot, targetCell);
+        })
     }
     
     if(checkLoss(opponentPlayer)){
@@ -153,8 +158,8 @@ function pvpMatch () {
     attachEventForPvpMatch(boardsContainer);
 }
 
-export function pvpRound (eventData) {
-    
+export async function pvpRound (eventData) {
+    const activePlayer = gameState.players[gameState.currentPlayer];
     const targetedBoard = eventData.parentElement
     
     if(targetedBoard.getAttribute("data-player-id") === activePlayer.id){
@@ -173,7 +178,10 @@ export function pvpRound (eventData) {
         return 
     }
     
-    markCellAsHit(hitOrNot, eventData);
+    await delayActions(1000).then(() => {
+        markCellAsHit(hitOrNot, eventData);
+    })
+    
     
     if(checkLoss(opponentPlayer)){
         triggerPhase("winner");

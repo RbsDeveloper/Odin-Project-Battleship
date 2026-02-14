@@ -27,3 +27,7 @@ export function getRandomCoord (gridSize = 10) {
 export function opponentIndex (currentIdx) {
     return 1-currentIdx;
 }
+
+export function delayActions (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
