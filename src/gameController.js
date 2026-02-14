@@ -1,5 +1,5 @@
-import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit } from "./ui.js";
-import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, proceedToSecondPlayerPlacement, enterGamePhaseForPvC, attachComputerBoardClicks, attachEventForPvpMatch } from "./events.js";
+import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog } from "./ui.js";
+import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, proceedToSecondPlayerPlacement, enterGamePhaseForPvC, attachComputerBoardClicks, attachEventForPvpMatch, attachEventForNewGamebtn, attachEventForPlayAgainBtn } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { placeFleetRandomlyForCurrentPlayer, resetPlayerBoard, changeShipDirection } from "./placementController.js";
 import { gameState, getBoards } from "./gameState.js";
@@ -12,6 +12,7 @@ export function triggerPhase(phase) {
         case "settings": enterSettingsPhase(); break;
         case "placement": enterPlacementPhase(); break;
         case "game": enterGamePhase(); break;
+        case "winner": enterWinnerPhase(); break;
     }
 }
 
@@ -96,7 +97,8 @@ function loadPlacementContainer () {
 }
 
 function singlePlayerMatch () {
-    const computerBoard = document.querySelector(`.board[data-player-id = "${gameState.players[1].id}"]`);
+    const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
+    const computerBoard = document.querySelector(`.board[data-player-id = "${opponentPlayer.id}"]`);
     attachComputerBoardClicks(computerBoard);
 }
 
@@ -104,26 +106,32 @@ export function runRound (eventData) {
 
     const row = parseInt(eventData.getAttribute("data-row"));
     const col = parseInt(eventData.getAttribute("data-col"));
+    const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
     
-    const hitOrNot = gameState.players[1].getBoard().receiveAttack([row, col]);
+    const hitOrNot = opponentPlayer.getBoard().receiveAttack([row, col]);
     if(hitOrNot === null) return
     markCellAsHit(hitOrNot, eventData);
-    gameState.currentPlayer[1]
+
+    if(checkLoss(opponentPlayer)){
+        triggerPhase("winner");
+        return
+    }
+
+    gameState.currentPlayer = opponentIndex(gameState.currentPlayer)
     computerAttack()      
    
 }
  
 function computerAttack () {
-    
-    const humanBoard = document.querySelector(`.board[data-player-id = "${gameState.players[0].id}"]`)
-    
+    const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
+    const humanBoard = document.querySelector(`.board[data-player-id = "${opponentPlayer.id}"]`)
     let hitOrNot = null
 
     while (hitOrNot === null) {
         const rowTarget = getRandomCoord();
         const colTarget = getRandomCoord();
 
-        hitOrNot = gameState.players[0].getBoard().receiveAttack([rowTarget, colTarget]);
+        hitOrNot = opponentPlayer.getBoard().receiveAttack([rowTarget, colTarget]);
 
         if(hitOrNot === null){ 
             continue
@@ -131,10 +139,13 @@ function computerAttack () {
             
         const targetCell = humanBoard.querySelector(`.cell[data-row = "${rowTarget}"][data-col = "${colTarget}"]`)
         markCellAsHit(hitOrNot, targetCell)
-        
     }
-    gameState.currentPlayer = 0;
     
+    if(checkLoss(opponentPlayer)){
+        triggerPhase("winner");
+        return
+    }
+    gameState.currentPlayer = opponentIndex(gameState.currentPlayer); 
 }
 
 function pvpMatch () {
@@ -143,7 +154,7 @@ function pvpMatch () {
 }
 
 export function pvpRound (eventData) {
-    const activePlayer = gameState.players[gameState.currentPlayer];
+    
     const targetedBoard = eventData.parentElement
     
     if(targetedBoard.getAttribute("data-player-id") === activePlayer.id){
@@ -162,7 +173,26 @@ export function pvpRound (eventData) {
         return 
     }
     
-    //const cellElementTargeted = targetedBoard.querySelector(`.cell[data-row = "${row}"][data-col = "${col}"]`);
     markCellAsHit(hitOrNot, eventData);
+    
+    if(checkLoss(opponentPlayer)){
+        triggerPhase("winner");
+        return
+    }
     gameState.currentPlayer = opponentIndex(gameState.currentPlayer)
+}
+
+function checkLoss (playerToCheck) {
+    return playerToCheck.getBoard().areAllShipSunk();   
+}
+
+function enterWinnerPhase () {
+    const activePlayer = gameState.players[gameState.currentPlayer];
+    document.body.append(renderWinnerDialog(activePlayer.id))
+    document.getElementById("winnerDialog").showModal();
+    const newGameBtn = document.getElementById("startNewGame");
+    const playAgainBtn =  document.getElementById("restartSamePlayers");
+
+    attachEventForNewGamebtn(newGameBtn);
+    attachEventForPlayAgainBtn(playAgainBtn);
 }
