@@ -104,13 +104,21 @@ function singlePlayerMatch () {
 }
 
 export async function runRound (eventData) {
+    
+    if(gameState.isProcessingTurn) return 
+
+    gameState.isProcessingTurn = true;
 
     const row = parseInt(eventData.getAttribute("data-row"));
     const col = parseInt(eventData.getAttribute("data-col"));
     const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
     
     const hitOrNot = opponentPlayer.getBoard().receiveAttack([row, col]);
-    if(hitOrNot === null) return
+    if(hitOrNot === null){
+        gameState.isProcessingTurn = false;
+        return
+    }
+
     playSound("fire")
     await delayActions(1000).then(()=>{
         playSound(hitOrNot)
@@ -119,11 +127,13 @@ export async function runRound (eventData) {
     
     if(checkLoss(opponentPlayer)){
         triggerPhase("winner");
+        gameState.isProcessingTurn = false;
         return
     }
 
     gameState.currentPlayer = opponentIndex(gameState.currentPlayer)
-    computerAttack()      
+    await computerAttack()      
+    gameState.isProcessingTurn = false;
    
 }
  
@@ -167,9 +177,13 @@ function pvpMatch () {
 export async function pvpRound (eventData) {
     const activePlayer = gameState.players[gameState.currentPlayer];
     const targetedBoard = eventData.parentElement
+
+    if(gameState.isProcessingTurn) return
+    gameState.isProcessingTurn = true;
     
     if(targetedBoard.getAttribute("data-player-id") === activePlayer.id){
         console.log('wrong board');
+        gameState.isProcessingTurn = false
         return
     }
 
@@ -180,7 +194,8 @@ export async function pvpRound (eventData) {
     const hitOrNot = opponentPlayer.getBoard().receiveAttack([row, col]);
     console.log(hitOrNot)
     if(hitOrNot === null){ 
-        console.log('hit the same cell')    
+        console.log('hit the same cell') 
+        gameState.isProcessingTurn = false;   
         return 
     }
 
@@ -194,9 +209,11 @@ export async function pvpRound (eventData) {
     
     if(checkLoss(opponentPlayer)){
         triggerPhase("winner");
+        gameState.isProcessingTurn = false
         return
     }
     gameState.currentPlayer = opponentIndex(gameState.currentPlayer)
+    gameState.isProcessingTurn = false
 }
 
 function checkLoss (playerToCheck) {

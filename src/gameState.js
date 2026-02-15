@@ -5,7 +5,8 @@ export const gameState = {
     currentPlayer: 0,
     settings: null,
     activeShip: null,
-    shipDirection: "horizontal"
+    shipDirection: "horizontal",
+    isProcessingTurn: false,
 }
 
 export function getBoards () {
@@ -27,6 +28,7 @@ export function resetEntireGameState () {
     gameState.settings = null;
     gameState.activeShip = null;
     gameState.shipDirection= "horizontal";
+    gameState.isProcessingTurn = false;
 }
 
 export function resetGameStateForReplay () {
@@ -34,5 +36,6 @@ export function resetGameStateForReplay () {
     gameState.currentPlayer = 0;
     gameState.activeShip = null;
     gameState.shipDirection = 'horizontal';
+    gameState.isProcessingTurn = false;
 }
 
