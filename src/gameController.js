@@ -4,6 +4,7 @@ import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { placeFleetRandomlyForCurrentPlayer, resetPlayerBoard, changeShipDirection } from "./placementController.js";
 import { gameState, getBoards } from "./gameState.js";
 import { delayActions, getRandomCoord, opponentIndex } from "./utils.js";
+import { playSound } from "./soundManager.js";
 
 export function triggerPhase(phase) {
     gameState.gamePhase = phase;
@@ -110,7 +111,9 @@ export async function runRound (eventData) {
     
     const hitOrNot = opponentPlayer.getBoard().receiveAttack([row, col]);
     if(hitOrNot === null) return
+    playSound("fire")
     await delayActions(1000).then(()=>{
+        playSound(hitOrNot)
         markCellAsHit(hitOrNot, eventData);    
     })
     
@@ -129,6 +132,8 @@ async function computerAttack () {
     const humanBoard = document.querySelector(`.board[data-player-id = "${opponentPlayer.id}"]`)
     let hitOrNot = null
 
+    await delayActions(1000)
+
     while (hitOrNot === null) {
         const rowTarget = getRandomCoord();
         const colTarget = getRandomCoord();
@@ -138,10 +143,11 @@ async function computerAttack () {
         if(hitOrNot === null){ 
             continue
         }
-            
+        playSound('fire')   
         const targetCell = humanBoard.querySelector(`.cell[data-row = "${rowTarget}"][data-col = "${colTarget}"]`)
        
         await delayActions(1000).then(()=> {
+            playSound(hitOrNot)
             markCellAsHit(hitOrNot, targetCell);
         })
     }
@@ -177,8 +183,11 @@ export async function pvpRound (eventData) {
         console.log('hit the same cell')    
         return 
     }
+
+    playSound('fire');
     
     await delayActions(1000).then(() => {
+        playSound(hitOrNot);
         markCellAsHit(hitOrNot, eventData);
     })
     
