@@ -44,7 +44,7 @@ export function resetPlayerBoard() {
 export function attemptShipPlacement (row, col) {
     const player = gameState.players[gameState.currentPlayer];
     const shipReference = getActiveShipFromPlayerFleet(player);
-    //console.log(shipReference)
+    
     try{    
         console.log(shipReference, gameState.shipDirection, [row, col])
         const placedCoords = player.getBoard().placeShip(shipReference, gameState.shipDirection, [row, col]);

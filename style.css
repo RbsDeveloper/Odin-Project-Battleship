@@ -78,3 +78,14 @@ main {
 .miss {
     background-color: blue;
 }
+
+.preview-valid {
+    background-color: lightgreen;
+    border-color: green;
+    opacity: 1;
+}
+
+.preview-invalid {
+    background-color: lightcoral;
+    border-color: red;
+}

@@ -1,5 +1,5 @@
 import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog } from "./ui.js";
-import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, proceedToSecondPlayerPlacement, enterGamePhaseForPvC, attachComputerBoardClicks, attachEventForPvpMatch, attachEventForNewGamebtn, attachEventForPlayAgainBtn } from "./events.js";
+import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, proceedToSecondPlayerPlacement, enterGamePhaseForPvC, attachComputerBoardClicks, attachEventForPvpMatch, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragEvent, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { placeFleetRandomlyForCurrentPlayer, resetPlayerBoard, changeShipDirection } from "./placementController.js";
 import { gameState, getBoards } from "./gameState.js";
@@ -91,8 +91,12 @@ function loadPlacementContainer () {
     interactiveBoard.append(renderGameboard(playerBoards[gameState.currentPlayer]));
     const shipContainer = document.querySelector(".shipContainer");
     attachActiveShipEventListener(shipContainer)
+    attachDragEvent(shipContainer);
     const playerBoard = document.querySelector(`.board[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
     attachBoardEventListener(playerBoard);
+    attachDragOverEvent(playerBoard);
+    attachDragLeaveEvent(playerBoard)
+    attachDropEvent(playerBoard);
     const btnsContainer = document.querySelector(`.btnContainer[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
     attachPlacementBtnsEventListener(btnsContainer);
 }
