@@ -18,20 +18,18 @@ export function Gameboard () {
     //Creates the ships instances using the details from shipDetails array
     const fleet = shipDetailsForCreation.map(ship => new Ship(ship.length, ship.id));
 
-    const placeShip = (ship, direction = "vertical", [row, col]) => {
-        const cellType = direction === "vertical" ? row : col;
+    const placeShip = (ship, direction, [row, col]) => {
         
-        isOutOfBounds(ship, cellType);
-
-        const coordsForShipPlacement = getCellsForPlacement(ship, direction, [row, col]);
-        console.log(`coordForShipPLacement: ${coordsForShipPlacement}`);
-        if(!canBePlaced(grid, coordsForShipPlacement)){
-            throw new Error("Ship can't be placed: overlapping ship")
+        const coordsForShipPlacement = getValidPlacementCoords(ship, direction, [row, col], grid)
+        
+        if(coordsForShipPlacement){
+            occupyCell(grid, coordsForShipPlacement, ship)
+            ship.setPlaced();
+            return coordsForShipPlacement;
+        }else{
+            throw new Error("Ship can't be placed")
         }
         
-        occupyCell(grid, coordsForShipPlacement, ship);
-        ship.setPlaced();
-        return coordsForShipPlacement;
     }
 
     const receiveAttack = ([row, col]) => {
@@ -100,7 +98,25 @@ function occupyCell (gameBoard, shipCoords, shipObj) {
         gameBoard[shipCoords[i][0]][shipCoords[i][1]].hasShip = true;
         gameBoard[shipCoords[i][0]][shipCoords[i][1]].shipReference = shipObj;
     }
+} 
+
+export function getValidPlacementCoords (ship, direction, [row, col], grid) {
+    
+    try{
+        const cellType = direction === "vertical" ? row : col;
+        isOutOfBounds(ship, cellType);
+        const coords = getCellsForPlacement(ship, direction, [row, col]);
+        if(canBePlaced(grid, coords)){
+            return coords
+        }else{
+            return null
+        }
+    }catch (err){
+        return null
+    }
 }
 
-
+export function getGhostCoords(ship, direction, [row, col]){
+    return getCellsForPlacement(ship, direction, [row, col])
+}
 
