@@ -99,7 +99,7 @@ export function renderPlacementScreen () {
 export function buildShip (shipDetails, destination) {
 
     shipDetails.forEach(item => {
-        const build = createCompleteElement("div", ["ship"], `${item.id}`, {id: `${item.id}`});
+        const build = createCompleteElement("div", ["ship"], `${item.id}`, {id: `${item.id}`, draggable: true});
         destination.append(build);
     })   
 }
@@ -221,4 +221,27 @@ export function renderWinnerDialog (winnerPlayer) {
 
 export function clearWindow () {
     document.body.innerHTML = "";
+}
+
+export function highlightPlacement (playerId, coords, isValid) {
+    const className = isValid ? "preview-valid" : "preview-invalid";
+    coords.forEach(([r,c]) => {
+        const cell = document.querySelector(`.board[data-player-id ='${playerId}'] .cell[data-row='${r}'][data-col='${c}']`);
+        if(cell){
+            cell.classList.add(className);
+        }
+    }) 
+}
+
+export function resetHighlightPlacement (playerId) {
+    let highlightedCells = document.querySelectorAll(
+        `.board[data-player-id='${playerId}'] .cell.preview-valid,
+         .board[data-player-id='${playerId}'] .cell.preview-invalid`
+        );
+    
+    
+        highlightedCells.forEach(cell => {
+        cell.classList.remove("preview-valid", "preview-invalid");
+        })
+    
 }
