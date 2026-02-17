@@ -1,4 +1,4 @@
-import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog } from "./ui.js";
+import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage } from "./ui.js";
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, proceedToSecondPlayerPlacement, enterGamePhaseForPvC, attachComputerBoardClicks, attachEventForPvpMatch, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragEvent, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { placeFleetRandomlyForCurrentPlayer, resetPlayerBoard, changeShipDirection } from "./placementController.js";
@@ -58,7 +58,7 @@ function enterGamePhase () {
     createPlayerBoardsArea(getBoards());
 
     gameState.currentPlayer = 0;
-
+    updateGameMessage(`Battle commenced! ${gameState.players[gameState.currentPlayer].id}, take the first shot.`);
     if(gameState.settings.mode === 'pvc'){
         singlePlayerMatch()
     }else{
@@ -71,16 +71,27 @@ export function initializePlacementUI () {
     fleetContainer.append(createShipPlacementUi(gameState.players[gameState.currentPlayer].id));
     const fleetContainerSelector = document.querySelector(`.shipContainer[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
     buildShip(gameState.players[gameState.currentPlayer].getBoard().shipDetailsForCreation, fleetContainerSelector);
-    loadPlacementContainer();     
+    loadPlacementContainer();
+    updateGameMessage(`Welcome, Admiral ${gameState.players[gameState.currentPlayer].id}. Deploy your fleet to the grid.`);     
 }
 
 export function fireActionBasedOnBtnTarget (targetBtnId) {
     if(gameState.gamePhase !== "placement") return;
 
     switch(targetBtnId) {
-        case "shipDirectionBtn": changeShipDirection(); break;
-        case "randomPlacementBtn": placeFleetRandomlyForCurrentPlayer(); break;
-        case "resetBtn": resetPlayerBoard(); break;
+        case "shipDirectionBtn": 
+            changeShipDirection(); 
+            const direction = gameState.shipDirection;
+            updateGameMessage(`Rotation: ${direction}.`)
+            break;
+        case "randomPlacementBtn": 
+            placeFleetRandomlyForCurrentPlayer(); 
+            updateGameMessage("Fleet deployed randomly!")
+            break;
+        case "resetBtn": 
+            resetPlayerBoard(); 
+            updateGameMessage("Board cleared. Ready for new orders.");
+            break;
         
     }
 }
@@ -126,7 +137,12 @@ export async function runRound (eventData) {
     playSound("fire")
     await delayActions(1000).then(()=>{
         playSound(hitOrNot)
-        markCellAsHit(hitOrNot, eventData);    
+        markCellAsHit(hitOrNot, eventData);
+        if(hitOrNot==='hit'){
+            updateGameMessage("Boom! You hit something!")
+        }else if(hitOrNot === 'miss') {
+            updateGameMessage("Darn, just water. Miss!")
+        }
     })
     
     if(checkLoss(opponentPlayer)){
@@ -134,9 +150,12 @@ export async function runRound (eventData) {
         gameState.isProcessingTurn = false;
         return
     }
+    await delayActions(1500);
+    updateGameMessage("Incoming fire! Computer is targeting...")
 
     gameState.currentPlayer = opponentIndex(gameState.currentPlayer)
-    await computerAttack()      
+    await computerAttack()  
+    updateGameMessage("Your turn! Take your next shot.");    
     gameState.isProcessingTurn = false;
    
 }
@@ -208,6 +227,11 @@ export async function pvpRound (eventData) {
     await delayActions(1000).then(() => {
         playSound(hitOrNot);
         markCellAsHit(hitOrNot, eventData);
+        if(hitOrNot==='hit'){
+            updateGameMessage(`Boom! ${activePlayer.id} scored a hit!`)
+        }else if(hitOrNot === 'miss') {
+            updateGameMessage(`Splash!${activePlayer.id} missed!`)
+        }
     })
     
     
@@ -216,7 +240,9 @@ export async function pvpRound (eventData) {
         gameState.isProcessingTurn = false
         return
     }
-    gameState.currentPlayer = opponentIndex(gameState.currentPlayer)
+    await delayActions(1500)
+    gameState.currentPlayer = opponentIndex(gameState.currentPlayer);
+    updateGameMessage(`It is now ${gameState.players[gameState.currentPlayer].id}'s turn! Target the enemy.`);
     gameState.isProcessingTurn = false
 }
 

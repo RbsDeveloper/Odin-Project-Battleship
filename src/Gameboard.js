@@ -20,16 +20,21 @@ export function Gameboard () {
 
     const placeShip = (ship, direction, [row, col]) => {
         
-        const coordsForShipPlacement = getValidPlacementCoords(ship, direction, [row, col], grid)
-        
-        if(coordsForShipPlacement){
-            occupyCell(grid, coordsForShipPlacement, ship)
-            ship.setPlaced();
-            return coordsForShipPlacement;
-        }else{
-            throw new Error("Ship can't be placed")
+        const coords = getCellsForPlacement(ship, direction, [row,col]);
+        const cellType = direction === "vertical" ? row : col;
+
+        try{
+            isOutOfBounds(ship, cellType);
+        }catch (err){
+            throw err
         }
-        
+
+        if(!canBePlaced(grid, coords)){
+            throw new Error("Ship collision! You can't stack vessels.")
+        }
+        occupyCell(grid, coords, ship)
+        ship.setPlaced();
+        return coords;
     }
 
     const receiveAttack = ([row, col]) => {

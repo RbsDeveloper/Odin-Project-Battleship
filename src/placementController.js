@@ -1,6 +1,6 @@
 import { gameState } from "./gameState.js";
 import { getRandomCoord, getRandomDirection } from "./utils.js";
-import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn } from "./ui.js";
+import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn, updateGameMessage } from "./ui.js";
 
 
 
@@ -11,6 +11,7 @@ export function selectShip (shipId) {
     if(!shipEl || !shipEl.classList.contains('ship')) return;
     toggleActiveClassOnShips(shipId, previousShip);
     gameState.activeShip = shipId;
+    updateGameMessage(`${shipId} selected. Awaiting deployment coordinates.`)
 }
 
 export function getActiveShipFromPlayerFleet (player) {
@@ -48,14 +49,16 @@ export function attemptShipPlacement (row, col) {
     try{    
         console.log(shipReference, gameState.shipDirection, [row, col])
         const placedCoords = player.getBoard().placeShip(shipReference, gameState.shipDirection, [row, col]);
-        markCellsOccupied( player.id , placedCoords)
+        markCellsOccupied( player.id , placedCoords);
+        updateGameMessage(`Nice spot! Ship placed.`);
         if(placedCoords){
             markShipAsPlaced(gameState.activeShip);
             gameState.activeShip = null;
         }
         console.log(player.getBoard().grid);
     }catch (error){
-        console.warn(error.message)
+        console.warn(error.message);
+        updateGameMessage(`${error.message}`);
     }
 }
 
