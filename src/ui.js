@@ -61,13 +61,15 @@ export function removeSecondPlayerInput () {
 //FUNCTION THAT CREATES THE GAME SCREEN OR ARENA
 export function renderGameScreen () {
     const mainContainer = createCompleteElement("main", [], "",);
+    const messageContainer = createCompleteElement("div", ["msgContainer"], "", {id: "msgWrapper"});
+    const interactiveArea = createCompleteElement("div", ["interactiveContainer"], "", {id: "interactiveZone"})
 
     const leftFleetContainer = createCompleteElement("div", ["fleetContainer"], "", {id: "leftFleet"});
     const middleContainer = createCompleteElement("div", ["gameboardsContainer"], "", {id: "boardsArea"})
     const rightFleetContainer = createCompleteElement("div", ["fleetContainer"],"", {id: "rightFleet"});
     
-    mainContainer.append(leftFleetContainer, middleContainer, rightFleetContainer);
-
+    interactiveArea.append(leftFleetContainer, middleContainer, rightFleetContainer);
+    mainContainer.append(messageContainer, interactiveArea);
     return mainContainer
 }
 
@@ -238,10 +240,16 @@ export function resetHighlightPlacement (playerId) {
         `.board[data-player-id='${playerId}'] .cell.preview-valid,
          .board[data-player-id='${playerId}'] .cell.preview-invalid`
         );
-    
-    
+     
         highlightedCells.forEach(cell => {
         cell.classList.remove("preview-valid", "preview-invalid");
-        })
-    
+        }) 
+}
+
+export function updateGameMessage (message){
+    const msgContainer = document.getElementById("msgWrapper");
+    if (!msgContainer) return;
+    msgContainer.innerText = "";
+    const messageElement = createCompleteElement("p", ["gameMsg"], `${message}`, {id: "msgText"});
+    msgContainer.append(messageElement);
 }
