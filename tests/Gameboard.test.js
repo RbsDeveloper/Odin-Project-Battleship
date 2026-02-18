@@ -58,7 +58,7 @@ describe("Placing ships", () => {
         expect(() => {
             gameBoard.placeShip(gameBoard.fleet[0], "horizontal", [5,4])
             gameBoard.placeShip(gameBoard.fleet[2], "horizontal", [5,2])
-        }).toThrow("Ship can't be placed: overlapping ship")
+        }).toThrow("Ship collision! You can't stack vessels.")
     })
 
     test("Choose a direction for the ship placement", () => {
@@ -84,7 +84,7 @@ describe("Placing ships", () => {
 describe("Receiving an attack", () => {
     test("Taking a pair of coordinates and check them", () => {
         gameBoard.placeShip(gameBoard.fleet[1], 'horizontal', [3,3])
-        expect(gameBoard.receiveAttack([3,4])).toBe(true)
+        expect(gameBoard.receiveAttack([3,4])).toBe("hit")
     })
 
     test("Taking a pair of coordinates and call hit on the ship object", () => {
@@ -118,7 +118,7 @@ describe("Receiving an attack", () => {
         
         gameBoard.placeShip(gameBoard.fleet[1], "horizontal", [3,3]);
         gameBoard.receiveAttack([3,4])
-        expect(() => gameBoard.receiveAttack([3,4])).toThrow("Cell allready hit");
+        expect(gameBoard.receiveAttack([3,4])).toBeNull();
         expect(gameBoard.grid[3][4]).toEqual({
             hasShip: true,
             shipReference: gameBoard.fleet[1],

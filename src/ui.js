@@ -1,4 +1,3 @@
-import { gameState } from "./gameState.js";
 import { createCompleteElement } from "./utils.js";
 
 //FUNCTION THAT CREATES THE START GAME DIALOG

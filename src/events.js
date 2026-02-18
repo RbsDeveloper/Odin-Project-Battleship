@@ -2,7 +2,7 @@ import { gameState, resetEntireGameState, resetGameStateForReplay } from "./game
 import { fireActionBasedOnBtnTarget, initGame, initializePlacementUI, pvpRound, runRound, triggerPhase } from "./gameController.js";
 import { isPlacementCompleted, selectShip, placeRandomFleet, attemptShipPlacement, getActiveShipFromPlayerFleet } from "./placementController.js";
 import { clearPlacementComponents, clearWindow, disableConfirmBtn, enableConfirmBtn, highlightPlacement, renderGameScreen, resetHighlightPlacement } from "./ui.js";
-import { getGhostCoords, getValidPlacementCoords } from "./Gameboard.js";
+
 
 export function attachStartBtnLister (element) {
     
@@ -139,8 +139,8 @@ export function attachDragOverEvent (element) {
         
         resetHighlightPlacement(player.id);
 
-        const ghostCoords = getGhostCoords(shipReference, gameState.shipDirection, [cellRow, cellCol]);
-        const coords = getValidPlacementCoords(shipReference, gameState.shipDirection, [cellRow, cellCol], player.getBoard().grid)
+        const ghostCoords = player.getBoard().getPreviewCoords(shipReference, gameState.shipDirection, [cellRow, cellCol])
+        const coords = player.getBoard().getValidPlacement(shipReference, gameState.shipDirection, [cellRow, cellCol])
 
         if(coords){
             highlightPlacement(player.id, coords, true);

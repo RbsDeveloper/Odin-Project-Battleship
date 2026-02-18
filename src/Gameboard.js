@@ -16,41 +16,57 @@ export function Gameboard () {
     ];
 
     //Creates the ships instances using the details from shipDetails array
-    const fleet = shipDetailsForCreation.map(ship => new Ship(ship.length, ship.id));
+    let fleet = shipDetailsForCreation.map(ship => new Ship(ship.length, ship.id));
+
+    const calculateCoords = (shipLength, direction, [row, col]) => {
+        const coords = [];
+        for(let i = 0; i < shipLength; i++){
+            coords.push(direction === "vertical" ? [row + i, col] : [row, col+i])
+        }
+
+        return coords;
+    }
+
+    const checkCoordsValidity = (coords) => {
+        for(const [r,c] of coords){
+            if(r<0 || r>=10 || c<0 || c>=10){
+                return {valid: false, reason: "Ship can't be placed out of the grid."}
+            }else if (grid[r][c].hasShip){
+                return {valid: false, reason: "Ship collision! You can't stack vessels."}
+            }
+        }
+        return {valid: true}
+    }
 
     const placeShip = (ship, direction, [row, col]) => {
         
-        const coords = getCellsForPlacement(ship, direction, [row,col]);
-        const cellType = direction === "vertical" ? row : col;
+        const coords = calculateCoords(ship.length, direction, [row, col])
+        const report = checkCoordsValidity(coords);
 
-        try{
-            isOutOfBounds(ship, cellType);
-        }catch (err){
-            throw err
-        }
+        if(!report.valid) throw new Error (report.reason);
 
-        if(!canBePlaced(grid, coords)){
-            throw new Error("Ship collision! You can't stack vessels.")
-        }
-        occupyCell(grid, coords, ship)
+        coords.forEach(([r,c]) => {
+            grid[r][c].hasShip = true;
+            grid[r][c].shipReference = ship
+        });
+
         ship.setPlaced();
         return coords;
     }
 
     const receiveAttack = ([row, col]) => {
-        if(grid[row][col].hasShip === true){
-            if(!grid[row][col].isHit){
-                grid[row][col].shipReference.hit();
-                grid[row][col].isHit = true;
-                return 'hit';
-            }else{
-                return null
-            }            
-        }else{
-            if(grid[row][col].isHit === true) return null 
-            grid[row][col].isHit = true;
-            return 'miss';               
+        const cell = grid[row][col];
+
+        if(cell.isHit) return null;
+        
+        cell.isHit = true;
+
+        if(cell.hasShip){
+            cell.shipReference.hit();
+            return "hit"
         }
+
+        return "miss"
     }
 
     const areAllShipSunk = () => {
@@ -60,68 +76,41 @@ export function Gameboard () {
 
         return true
     }
-    
-    return { grid, fleet, shipDetailsForCreation, placeShip, receiveAttack, areAllShipSunk }
-}
 
-function isOutOfBounds (shipObj, cellType) {
-    const totalCellOccupied = shipObj.length
-    const lastCellOfShip = cellType + (totalCellOccupied - 1);
+    const getValidPlacement = (ship, direction, [row, col]) => {
+        const coords = calculateCoords(ship.length, direction, [row,col]);
+        return checkCoordsValidity(coords).valid ? coords : null;
+    }
 
-    if( lastCellOfShip > 9) throw new Error("Ship can't be placed out of the grid")
+    const getPreviewCoords = (ship, direction, [row,col]) => {
+        return calculateCoords(ship.length, direction, [row, col]);
+    }
 
-}
+    const reset = () => {
+        grid = Array(10).fill(null).map(() => Array(10).fill(null).map(() =>({
+            hasShip: false,
+            shipReference: null,
+            isHit: false,
+        })));
 
-function getCellsForPlacement (shipObj, direction, [rowCoords, colCoords]) {
-
-    let cellsForPlacement = [];
-
-    if(direction === 'vertical'){
-        for(let i = rowCoords; i < rowCoords + shipObj.length; i++){
-            cellsForPlacement.push([i, colCoords])
-        }
-    }else{
-        for(let i = colCoords; i < colCoords + shipObj.length; i++){
-            cellsForPlacement.push([rowCoords, i])
-        }
+        fleet = shipDetailsForCreation.map(ship => new Ship(ship.length, ship.id));
     }
     
-    return cellsForPlacement
-}
-
-function canBePlaced (gameBoard, shipCoords) {
-    for(let i = 0; i < shipCoords.length; i++){
-        if(gameBoard[shipCoords[i][0]][shipCoords[i][1]].hasShip === true){
-            return false
-        }
-    }
-    return true
-}
-
-function occupyCell (gameBoard, shipCoords, shipObj) {
-    for(let i = 0; i < shipCoords.length; i++){
-        gameBoard[shipCoords[i][0]][shipCoords[i][1]].hasShip = true;
-        gameBoard[shipCoords[i][0]][shipCoords[i][1]].shipReference = shipObj;
-    }
-} 
-
-export function getValidPlacementCoords (ship, direction, [row, col], grid) {
-    
-    try{
-        const cellType = direction === "vertical" ? row : col;
-        isOutOfBounds(ship, cellType);
-        const coords = getCellsForPlacement(ship, direction, [row, col]);
-        if(canBePlaced(grid, coords)){
-            return coords
-        }else{
-            return null
-        }
-    }catch (err){
-        return null
+    return { 
+        get grid() {
+            return grid
+        }, 
+        fleet, 
+        shipDetailsForCreation, 
+        placeShip, 
+        receiveAttack, 
+        areAllShipSunk,
+        getPreviewCoords,
+        getValidPlacement,
+        reset,    
     }
 }
 
-export function getGhostCoords(ship, direction, [row, col]){
-    return getCellsForPlacement(ship, direction, [row, col])
-}
+
+
 

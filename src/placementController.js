@@ -34,7 +34,7 @@ export function changeShipDirection() {
 
 export function resetPlayerBoard() {
     const player = gameState.players[gameState.currentPlayer];
-    player.clearGameboard();
+    player.getBoard().reset();
 
     resetBoardUi(player.id, player.getBoard().grid)
     resetFleetUi(player.id)
