@@ -1,8 +1,6 @@
 import { gameState } from "./gameState.js";
 import { getRandomCoord, getRandomDirection } from "./utils.js";
-import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn, updateGameMessage } from "./ui.js";
-
-
+import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn, updateGameMessage, resetHighlightPlacement, highlightPlacement } from "./ui.js";
 
 export function selectShip (shipId) {
     const previousShip = gameState.activeShip && gameState.activeShip !== shipId ? gameState.activeShip : null;
@@ -136,5 +134,29 @@ export function isPlacementCompleted (player) {
     }
 
     return true
+}
 
+export function handlePlacementHover (row, col) {
+    const player = gameState.players[gameState.currentPlayer];
+    const ship = getActiveShipFromPlayerFleet(player);
+
+    if(!ship) return;
+
+    resetHighlightPlacement(player.id);
+
+    const ghostCoords = player.getBoard().getPreviewCoords(ship, gameState.shipDirection, [row, col]);
+    const coords = player.getBoard().getValidPlacement(ship, gameState.shipDirection, [row, col]);
+
+    if(coords){
+        highlightPlacement(player.id, coords, true);
+    }else{
+        highlightPlacement(player.id, ghostCoords, false);
+    }
+}
+
+export function handlePlacementDrop (row, col){
+    const player = gameState.players[gameState.currentPlayer];
+    resetHighlightPlacement(player.id);
+    attemptShipPlacement(row, col);
+    if(isPlacementCompleted(player)) enableConfirmBtn();
 }
