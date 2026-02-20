@@ -1,4 +1,5 @@
 import { Gameboard } from "./Gameboard.js"
+import { generateAttackMoves } from "./utils.js";
 
 export function Player (type, id) {
 
@@ -8,7 +9,7 @@ export function Player (type, id) {
         return gameboard
     }
 
-    return {
+    const player =  {
         get type(){
             return type
         }, 
@@ -17,4 +18,14 @@ export function Player (type, id) {
         }, 
         getBoard,
     }
+
+    if(type === "computer"){
+        const computerAttackOptions = generateAttackMoves();
+
+        player.getNextMove = function () {
+           return computerAttackOptions.pop();
+        }
+    }
+
+    return player
 }

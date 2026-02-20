@@ -31,3 +31,23 @@ export function opponentIndex (currentIdx) {
 export function delayActions (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+export function generateAttackMoves () {
+    const coords = [];
+
+    for (let r = 0; r < 10; r++) {
+        for (let c = 0; c < 10; c++) {
+            coords.push({ row: r, col: c });
+        }
+    }
+
+    let i = coords.length, j, temp;
+
+    while(--i > 0){
+        j = Math.floor(Math.random()*(i+1));
+        temp = coords[j];
+        coords[j] = coords[i];
+        coords[i] = temp
+    }
+    return coords;
+}
