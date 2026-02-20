@@ -1,118 +1,56 @@
-import { gameState, resetEntireGameState, resetGameStateForReplay } from "./gameState.js";
-import { fireActionBasedOnBtnTarget, initGame, initializePlacementUI, pvpRound, runRound, triggerPhase } from "./gameController.js";
-import { isPlacementCompleted, selectShip, placeRandomFleet, attemptShipPlacement, getActiveShipFromPlayerFleet } from "./placementController.js";
-import { clearPlacementComponents, clearWindow, disableConfirmBtn, enableConfirmBtn, highlightPlacement, renderGameScreen, resetHighlightPlacement } from "./ui.js";
 
-
-export function attachStartBtnLister (element) {
-    
-    element.addEventListener("click", () => {   
-        element.remove();
-        triggerPhase("settings");
-    })
+export function attachStartBtnLister (element, callback) {
+    element.addEventListener("click", callback)
 }
 
-export function attachFormEventListener (element, elementToRemove) {
-    element.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const formData = new FormData(element);
-        elementToRemove.close();
-        elementToRemove.remove();
-        gameState.settings = Object.fromEntries(formData);
-        triggerPhase("placement");
-    })
+export function attachFormEventListener (element, callback) {
+    element.addEventListener("submit", callback)
 }
 
-export function attachActiveShipEventListener (element) {
+export function attachActiveShipEventListener (element, callback) {
     element.addEventListener("click", (event) => {
         const targetEl = event.target;
         if(targetEl.classList.contains("ship")){
             console.log(event.target)
-            selectShip(targetEl.id);
+            callback(targetEl.id);
         }
     })
 }
 
-export function attachBoardEventListener (element) {
+export function attachBoardEventListener (element, callback) {
     element.addEventListener("click", (event) => {
-        
-        const row = parseInt(event.target.getAttribute("data-row"));
-        const col = parseInt(event.target.getAttribute("data-col"));
-        console.log(row, col)
-        attemptShipPlacement(row, col);
-        if(isPlacementCompleted(gameState.players[gameState.currentPlayer])) enableConfirmBtn();
+        const cell = event.target.closest(".cell");
+        if(!cell) return;
+        callback(cell);
     })
 }
 
-export function attachPlacementBtnsEventListener (element) {
+export function attachPlacementBtnsEventListener (element, callback) {
     element.addEventListener("click", (event) => {
         console.log(event)
-        let target = event.target;
+        const target = event.target;
         if(target.id){
             console.log("it has an Id");
-            fireActionBasedOnBtnTarget(target.id);
+            callback(target.id);
         }else{
             console.log("No Id here");
         }
     })
 }
 
-export function proceedToSecondPlayerPlacement (element) {
-    element.addEventListener("click", ()=> {
-        console.log("clicked")
-        gameState.currentPlayer = 1;
-        disableConfirmBtn()
-        clearPlacementComponents()
-        initializePlacementUI()
-        enterGamePhaseForPvP(element)
-    },
-{once: true})
+export function attachConfirmBtnListener (element, callback) {
+    element.addEventListener("click", callback);
 }
 
-function enterGamePhaseForPvP (element) {
-    element.addEventListener("click", ()=> {
-        triggerPhase("game");
-    })
+export function attachEventForNewGamebtn (element, callback) {
+    element.addEventListener("click", callback)
 }
 
-export function enterGamePhaseForPvC (element) {
-    element.addEventListener("click", ()=> {
-        gameState.currentPlayer = 1;
-        placeRandomFleet();
-        triggerPhase("game");
-    })
+export function attachEventForPlayAgainBtn (element, callback) {
+    element.addEventListener("click", callback)
 }
 
-export function attachComputerBoardClicks (element) {
-    element.addEventListener("click", (e) => {
-        runRound(e.target)
-    })
-}
-
-export function attachEventForPvpMatch (element) {
-    element.addEventListener("click", (event) => {
-        console.log(event.target);
-        pvpRound(event.target);
-    })
-}
-
-export function attachEventForNewGamebtn (element) {
-    element.addEventListener("click", () => {
-        clearWindow();
-        resetEntireGameState()
-        initGame()
-    })
-}
-
-export function attachEventForPlayAgainBtn (element) {
-    element.addEventListener("click", () => {
-        clearWindow();
-        resetGameStateForReplay();
-        triggerPhase("placement")
-    })
-}
-
-export function attachDragEvent (element) {
+export function attachDragStartListener (element, callback) {
     element.addEventListener('dragstart', (event) => {
 
         const draggedElement = event.target
@@ -120,55 +58,35 @@ export function attachDragEvent (element) {
         if(draggedElement.classList.contains("ship")){
             console.log('dragging')
             console.log(draggedElement);
-            selectShip(draggedElement.id)
+            callback(draggedElement.id)
         }
     })
 }
 
-export function attachDragOverEvent (element) {
+export function attachDragOverEvent (element, callback) {
     element.addEventListener('dragover', (event) => {
         event.preventDefault();
         const cell = event.target.closest(".cell");
         if(!cell) return
-        const cellRow = parseInt(cell.getAttribute("data-row"));
-        const cellCol = parseInt(cell.getAttribute("data-col"));
-
-        //obtaining active ship : 
-        const player = gameState.players[gameState.currentPlayer];
-        const shipReference = getActiveShipFromPlayerFleet(player);
+        const cellRow = parseInt(cell.dataset.row);
+        const cellCol = parseInt(cell.dataset.col);
         
-        resetHighlightPlacement(player.id);
-
-        const ghostCoords = player.getBoard().getPreviewCoords(shipReference, gameState.shipDirection, [cellRow, cellCol])
-        const coords = player.getBoard().getValidPlacement(shipReference, gameState.shipDirection, [cellRow, cellCol])
-
-        if(coords){
-            highlightPlacement(player.id, coords, true);
-        }else{
-            highlightPlacement(player.id, ghostCoords, false);
-        }
-        
+        callback(cellRow, cellCol);
     })
 }
 
-export function attachDragLeaveEvent (element) {
-    element.addEventListener('dragleave', () => {
-        const player = gameState.players[gameState.currentPlayer];
-        resetHighlightPlacement(player.id)
-    })
+export function attachDragLeaveEvent (element, callback) {
+    element.addEventListener('dragleave', callback)
 }
 
-export function attachDropEvent (element) {
+export function attachDropEvent (element, callback) {
     element.addEventListener("drop", (event)=> {
         event.preventDefault()
         const cell = event.target.closest(".cell");
         
         if(!cell) return
-        const cellRow = parseInt(cell.getAttribute("data-row"));
-        const cellCol = parseInt(cell.getAttribute("data-col"));
-        
-        resetHighlightPlacement(gameState.players[gameState.currentPlayer].id);
-        attemptShipPlacement(cellRow, cellCol);
-        if(isPlacementCompleted(gameState.players[gameState.currentPlayer])) enableConfirmBtn();
+        const cellRow = parseInt(cell.dataset.row);
+        const cellCol = parseInt(cell.dataset.col);
+        callback(cellRow, cellCol)
     })
 }
