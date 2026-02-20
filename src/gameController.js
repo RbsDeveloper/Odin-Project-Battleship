@@ -1,7 +1,7 @@
 import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents } from "./ui.js";
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
-import { placeFleetRandomlyForCurrentPlayer, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, placeRandomFleet } from "./placementController.js";
+import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
 import { gameState, getBoards } from "./gameState.js";
 import { delayActions, getRandomCoord, opponentIndex } from "./utils.js";
 import { playSound } from "./soundManager.js";
@@ -66,7 +66,7 @@ function handlePlacementConfirmation() {
         }
     }else {
         gameState.currentPlayer = 1;
-        placeRandomFleet();
+        randomizeComputerFleet();
         triggerPhase("game")
     }
 }
@@ -126,7 +126,7 @@ export function fireActionBasedOnBtnTarget (targetBtnId) {
             updateGameMessage(`Rotation: ${direction}.`)
             break;
         case "randomPlacementBtn": 
-            placeFleetRandomlyForCurrentPlayer(); 
+            randomizeHumanFleet(); 
             updateGameMessage("Fleet deployed randomly!")
             break;
         case "resetBtn": 

@@ -60,12 +60,9 @@ export function attemptShipPlacement (row, col) {
     }
 }
 
-//Used for the placeRandomFleet BTN
-export function placeFleetRandomlyForCurrentPlayer () {
-    resetPlayerBoard()
-    const playerFleet = gameState.players[gameState.currentPlayer].getBoard().fleet;
-    const activePlayer = gameState.players[gameState.currentPlayer]
-
+function executeRandomPlacement(player, updateUi = false) {
+    const playerFleet = player.getBoard().fleet;
+    
     for(const boat of playerFleet){
         let placed = false;
 
@@ -78,52 +75,34 @@ export function placeFleetRandomlyForCurrentPlayer () {
             gameState.shipDirection = direction;
 
             try {
-                const placedCoords = activePlayer.getBoard().placeShip(boat, gameState.shipDirection, [rowCoord, colCoord]);
-                markCellsOccupied( activePlayer.id , placedCoords)
-                if(placedCoords){
+                const placedCoords = player.getBoard().placeShip(boat, gameState.shipDirection, [rowCoord, colCoord]);
+                if(updateUi){
+                    markCellsOccupied( player.id , placedCoords)
                     markShipAsPlaced(gameState.activeShip);
-                    gameState.activeShip = null;
                 }
+                  
                 placed = true;
             }catch (err) { 
                 // invalid placement, try again
             }
         }
     }
-    if(isPlacementCompleted(activePlayer)) enableConfirmBtn();
+}
+
+//Used for the placeRandomFleet BTN
+export function randomizeHumanFleet () {
+    resetPlayerBoard()
+    const player = gameState.players[gameState.currentPlayer]
+    executeRandomPlacement(player, true)
+    gameState.activeShip = null;
+    if(isPlacementCompleted(player)) enableConfirmBtn();
 };
 
 //Used as a random fleet placement for the CPU
-export function placeRandomFleet () {
-    const activePlayer = gameState.players[gameState.currentPlayer]
-    const playerFleet = activePlayer.getBoard().fleet;
-    
-
-    for(const boat of playerFleet){
-        let placed = false;
-        
-
-        while(placed === false){
-            const direction = getRandomDirection()
-            const rowCoord = getRandomCoord();
-            const colCoord = getRandomCoord();
-
-            gameState.activeShip = boat.id;
-            gameState.shipDirection = direction;
-
-            try {
-                const placedCoords = activePlayer.getBoard().placeShip(boat, gameState.shipDirection, [rowCoord, colCoord]);
-                //markCellsOccupied( activePlayer.id , placedCoords)
-                if(placedCoords){
-                    //markShipAsPlaced(gameState.activeShip);
-                    gameState.activeShip = null;
-                }
-                placed = true;
-            }catch (err) { 
-                // invalid placement, try again
-            }
-        }
-    }
+export function randomizeComputerFleet () {
+    const player = gameState.players[gameState.currentPlayer]
+    executeRandomPlacement(player);
+    gameState.activeShip = null;
 }
 
 export function isPlacementCompleted (player) {
