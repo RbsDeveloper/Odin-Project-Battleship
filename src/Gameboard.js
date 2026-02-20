@@ -100,7 +100,9 @@ export function Gameboard () {
         get grid() {
             return grid
         }, 
-        fleet, 
+        get fleet() {
+            return fleet
+        }, 
         shipDetailsForCreation, 
         placeShip, 
         receiveAttack, 
