@@ -21,9 +21,42 @@ export function Player (type, id) {
 
     if(type === "computer"){
         const computerAttackOptions = generateAttackMoves();
+        const possibleEnemyShipPosition = [];
 
         player.getNextMove = function () {
-           return computerAttackOptions.pop();
+            if(possibleEnemyShipPosition.length > 0){
+                const nextTarget = possibleEnemyShipPosition.pop();
+               
+                const index = computerAttackOptions.findIndex(coord => coord.row === nextTarget.row && coord.col === nextTarget.col);
+                if(index !== -1) computerAttackOptions.splice( index, 1)
+               
+                return nextTarget;
+            }else{
+                return computerAttackOptions.pop();
+            }
+           
+        }
+
+        player.addAdjacentCells = function (coords) {
+            const {row, col} = coords;
+
+            const directions = [
+                [row-1, col],
+                [row+1, col],
+                [row, col-1],
+                [row, col+1],
+            ]
+
+            directions.forEach(([r,c]) => {
+                const index = computerAttackOptions.findIndex(coord => coord.row === r && coord.col === c );
+
+                if(index !== -1){
+                    const alreadyInsideTargetQueue = possibleEnemyShipPosition.some(p => p.row === r && p.col === c);
+                    if(!alreadyInsideTargetQueue){
+                        possibleEnemyShipPosition.push({row:r, col:c});
+                    }
+                }
+            })
         }
     }
 

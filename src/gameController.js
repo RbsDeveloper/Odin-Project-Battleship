@@ -3,7 +3,7 @@ import { attachActiveShipEventListener, attachBoardEventListener, attachFormEven
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
 import { gameState, getBoards } from "./gameState.js";
-import { delayActions, getRandomCoord, opponentIndex } from "./utils.js";
+import { delayActions, opponentIndex } from "./utils.js";
 import { playSound } from "./soundManager.js";
 
 export function triggerPhase(phase) {
@@ -192,7 +192,8 @@ async function computerAttack () {
         markCellAsHit(resultOfTheAttack, targetCell);
 
         if(resultOfTheAttack==='hit'){
-            updateGameMessage(`Boom! ${gameState.players[gameState.currentPlayer].id} scored a hit!`)
+            updateGameMessage(`Boom! ${gameState.players[gameState.currentPlayer].id} scored a hit!`);
+            gameState.players[gameState.currentPlayer].addAdjacentCells(computerAttackCoords);
         }else if(resultOfTheAttack === 'miss') {
             updateGameMessage(`Splash!${gameState.players[gameState.currentPlayer].id} missed!`)
         }
