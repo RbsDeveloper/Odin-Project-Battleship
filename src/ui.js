@@ -200,7 +200,7 @@ export function clearPlacementComponents () {
 
 export function markCellAsHit (attackResult, cell) {
 
-    if(attackResult === "hit") {
+    if(attackResult === "hit" || attackResult === "sunk") {
         cell.classList.add("hit");
     }else if(attackResult === 'miss'){
         cell.classList.add("miss");

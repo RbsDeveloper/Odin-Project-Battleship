@@ -1,8 +1,8 @@
-import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents } from "./ui.js";
+import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow } from "./ui.js";
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
-import { gameState, getBoards } from "./gameState.js";
+import { gameState, getBoards, resetEntireGameState } from "./gameState.js";
 import { delayActions, opponentIndex } from "./utils.js";
 import { playSound } from "./soundManager.js";
 
@@ -194,9 +194,13 @@ async function computerAttack () {
         if(resultOfTheAttack==='hit'){
             updateGameMessage(`Boom! ${gameState.players[gameState.currentPlayer].id} scored a hit!`);
             gameState.players[gameState.currentPlayer].addAdjacentCells(computerAttackCoords);
-        }else if(resultOfTheAttack === 'miss') {
+        }else if(resultOfTheAttack === 'miss'){
             updateGameMessage(`Splash!${gameState.players[gameState.currentPlayer].id} missed!`)
+        }else if(resultOfTheAttack === 'sunk'){
+             updateGameMessage("DIRECT HIT! One of our ships has been sent to the bottom!");
+             gameState.players[gameState.currentPlayer].clearTargetingQueue();
         }
+
     
     
     await delayActions(500)
@@ -275,6 +279,8 @@ async function handleCombatFlow(targetEl,currentPlayer , opponent, row, col) {
         updateGameMessage(`Boom! ${currentPlayer.id} scored a hit!`)
     }else if(resultOfTheAttack === 'miss') {
         updateGameMessage(`Splash!${currentPlayer.id} missed!`)
+    }else if(resultOfTheAttack === "sunk"){
+        updateGameMessage(`BOOM! Admiral ${gameState.players[gameState.currentPlayer].id} has sunk one of the opponent ships!`)
     }
     
     await delayActions(500)

@@ -58,6 +58,13 @@ export function Player (type, id) {
                 }
             })
         }
+
+        player.clearTargetingQueue = function () {
+            possibleEnemyShipPosition.forEach(coord => {
+                computerAttackOptions.splice(Math.floor(Math.random() * (computerAttackOptions.length +1)), 0, coord)
+            })
+            possibleEnemyShipPosition.length = 0;
+        }
     }
 
     return player

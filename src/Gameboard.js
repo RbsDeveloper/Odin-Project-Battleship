@@ -63,6 +63,7 @@ export function Gameboard () {
 
         if(cell.hasShip){
             cell.shipReference.hit();
+            if(cell.shipReference.isSunk()) return "sunk"
             return "hit"
         }
 
