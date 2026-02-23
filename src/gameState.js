@@ -20,22 +20,24 @@ export function getBoards () {
     return boards;
 }
 
-export function resetEntireGameState () {
-    gameState.players = [];
-    gameState.mode = null;
-    gameState.gamePhase = null;
-    gameState.currentPlayer = 0;
-    gameState.settings = null;
-    gameState.activeShip = null;
-    gameState.shipDirection= "horizontal";
-    gameState.isProcessingTurn = false;
-}
-
-export function resetGameStateForReplay () {
+export function resetGameState (fullReset = false) {
+    if(fullReset){
+        gameState.mode = null;
+        gameState.gamePhase = null;
+        gameState.settings = null;
+    }
     gameState.players = [];
     gameState.currentPlayer = 0;
     gameState.activeShip = null;
     gameState.shipDirection = 'horizontal';
     gameState.isProcessingTurn = false;
+}
+
+export function getCurrentPlayer () {
+    return gameState.players[gameState.currentPlayer];
+}
+
+export function opponentIndex (currentIdx) {
+    return 1-currentIdx;
 }
 

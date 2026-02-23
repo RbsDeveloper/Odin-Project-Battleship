@@ -2,8 +2,8 @@ import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsAr
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
-import { gameState, getBoards, resetEntireGameState } from "./gameState.js";
-import { delayActions, opponentIndex } from "./utils.js";
+import { gameState, getBoards, getCurrentPlayer, opponentIndex, resetGameState } from "./gameState.js";
+import { delayActions } from "./utils.js";
 import { playSound } from "./soundManager.js";
 
 export function triggerPhase(phase) {
@@ -86,7 +86,7 @@ function enterGamePhase () {
     createPlayerBoardsArea(getBoards());
 
     gameState.currentPlayer = 0;
-    updateGameMessage(`Battle commenced! ${gameState.players[gameState.currentPlayer].id}, take the first shot.`);
+    updateGameMessage(`Battle commenced! ${getCurrentPlayer().id}, take the first shot.`);
     if(gameState.settings.mode === 'pvc'){
         singlePlayerMatch()
     }else{
@@ -99,7 +99,7 @@ export function handleBoardClick(targetEl) {
     const col = parseInt(targetEl.dataset.col);
     if(gameState.gamePhase === "placement"){
         attemptShipPlacement(row, col);
-        if(isPlacementCompleted(gameState.players[gameState.currentPlayer])){
+        if(isPlacementCompleted(getCurrentPlayer())){
             enableConfirmBtn()
         }
     }else if(gameState.gamePhase === "game"){
@@ -109,11 +109,11 @@ export function handleBoardClick(targetEl) {
 
 export function initializePlacementUI () {
     const fleetContainer = document.getElementById("fleetPlacementControls");
-    fleetContainer.append(createShipPlacementUi(gameState.players[gameState.currentPlayer].id));
-    const fleetContainerSelector = document.querySelector(`.shipContainer[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
-    buildShip(gameState.players[gameState.currentPlayer].getBoard().shipDetailsForCreation, fleetContainerSelector);
+    fleetContainer.append(createShipPlacementUi(getCurrentPlayer().id));
+    const fleetContainerSelector = document.querySelector(`.shipContainer[data-player-id = '${getCurrentPlayer().id}']`);
+    buildShip(getCurrentPlayer().getBoard().shipDetailsForCreation, fleetContainerSelector);
     loadPlacementContainer();
-    updateGameMessage(`Welcome, Admiral ${gameState.players[gameState.currentPlayer].id}. Deploy your fleet to the grid.`);     
+    updateGameMessage(`Welcome, Admiral ${getCurrentPlayer().id}. Deploy your fleet to the grid.`);     
 }
 
 export function fireActionBasedOnBtnTarget (targetBtnId) {
@@ -142,7 +142,7 @@ function handleDragStart (elementId) {
 }
 
 function handleDragLeave () {
-    const player = gameState.players[gameState.currentPlayer];
+    const player = getCurrentPlayer();
     resetHighlightPlacement(player.id)
 }
 
@@ -153,12 +153,12 @@ function loadPlacementContainer () {
     const shipContainer = document.querySelector(".shipContainer");
     attachActiveShipEventListener(shipContainer, handleDragStart)
     attachDragStartListener(shipContainer, selectShip);
-    const playerBoard = document.querySelector(`.board[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
+    const playerBoard = document.querySelector(`.board[data-player-id = '${getCurrentPlayer().id}']`);
     attachBoardEventListener(playerBoard, handleBoardClick);
     attachDragOverEvent(playerBoard, handlePlacementHover);
     attachDragLeaveEvent(playerBoard, handleDragLeave)
     attachDropEvent(playerBoard, handlePlacementDrop);
-    const btnsContainer = document.querySelector(`.btnContainer[data-player-id = '${gameState.players[gameState.currentPlayer].id}']`);
+    const btnsContainer = document.querySelector(`.btnContainer[data-player-id = '${getCurrentPlayer().id}']`);
     attachPlacementBtnsEventListener(btnsContainer, fireActionBasedOnBtnTarget);
 }
 
@@ -176,7 +176,7 @@ function pvpMatch () {
 async function computerAttack () {
     const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
     const humanBoard = document.querySelector(`.board[data-player-id = "${opponentPlayer.id}"]`)
-    const computerAttackCoords = gameState.players[gameState.currentPlayer].getNextMove();
+    const computerAttackCoords = getCurrentPlayer().getNextMove();
     console.log(computerAttackCoords)
 
     await delayActions(1000)
@@ -192,13 +192,13 @@ async function computerAttack () {
         markCellAsHit(resultOfTheAttack, targetCell);
 
         if(resultOfTheAttack==='hit'){
-            updateGameMessage(`Boom! ${gameState.players[gameState.currentPlayer].id} scored a hit!`);
-            gameState.players[gameState.currentPlayer].addAdjacentCells(computerAttackCoords);
+            updateGameMessage(`Boom! ${getCurrentPlayer().id} scored a hit!`);
+            getCurrentPlayer().addAdjacentCells(computerAttackCoords);
         }else if(resultOfTheAttack === 'miss'){
-            updateGameMessage(`Splash!${gameState.players[gameState.currentPlayer].id} missed!`)
+            updateGameMessage(`Splash!${getCurrentPlayer().id} missed!`)
         }else if(resultOfTheAttack === 'sunk'){
              updateGameMessage("DIRECT HIT! One of our ships has been sent to the bottom!");
-             gameState.players[gameState.currentPlayer].clearTargetingQueue();
+             getCurrentPlayer().clearTargetingQueue();
         }
 
     
@@ -220,18 +220,18 @@ function checkLoss (playerToCheck) {
 
 function handleNewGame () {
     clearWindow();
-    resetEntireGameState()
+    resetGameState(true)
     initGame()
 }
 
 function handlePlayAgain () {
     clearWindow();
-    resetGameStateForReplay();
+    resetGameState();
     triggerPhase("placement")
 }
 
 function enterWinnerPhase () {
-    const activePlayer = gameState.players[gameState.currentPlayer];
+    const activePlayer = getCurrentPlayer();
     document.body.append(renderWinnerDialog(activePlayer.id))
     document.getElementById("winnerDialog").showModal();
     const newGameBtn = document.getElementById("startNewGame");
@@ -243,7 +243,7 @@ function enterWinnerPhase () {
 
 function processAttack(targetEl) {
     const playerBoard = targetEl.parentElement;
-    const activePlayer = gameState.players[gameState.currentPlayer];
+    const activePlayer = getCurrentPlayer();
     const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
     const row = parseInt(targetEl.dataset.row);
     const col = parseInt(targetEl.dataset.col);
@@ -280,7 +280,7 @@ async function handleCombatFlow(targetEl,currentPlayer , opponent, row, col) {
     }else if(resultOfTheAttack === 'miss') {
         updateGameMessage(`Splash!${currentPlayer.id} missed!`)
     }else if(resultOfTheAttack === "sunk"){
-        updateGameMessage(`BOOM! Admiral ${gameState.players[gameState.currentPlayer].id} has sunk one of the opponent ships!`)
+        updateGameMessage(`BOOM! Admiral ${getCurrentPlayer().id} has sunk one of the opponent ships!`)
     }
     
     await delayActions(500)
@@ -292,7 +292,7 @@ async function handleCombatFlow(targetEl,currentPlayer , opponent, row, col) {
 
     await delayActions(1000);
     gameState.currentPlayer = opponentIndex(gameState.currentPlayer);
-    updateGameMessage(`It is now ${gameState.players[gameState.currentPlayer].id}'s turn!`);
+    updateGameMessage(`It is now ${getCurrentPlayer().id}'s turn!`);
     
     if(gameState.settings.mode === "pvc"){
         await computerAttack()

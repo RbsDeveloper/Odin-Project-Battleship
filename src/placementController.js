@@ -1,4 +1,4 @@
-import { gameState } from "./gameState.js";
+import { gameState, getCurrentPlayer } from "./gameState.js";
 import { getRandomCoord, getRandomDirection } from "./utils.js";
 import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn, updateGameMessage, resetHighlightPlacement, highlightPlacement } from "./ui.js";
 
@@ -31,7 +31,7 @@ export function changeShipDirection() {
 }
 
 export function resetPlayerBoard() {
-    const player = gameState.players[gameState.currentPlayer];
+    const player = getCurrentPlayer();
     player.getBoard().reset();
 
     resetBoardUi(player.id, player.getBoard().grid)
@@ -41,7 +41,7 @@ export function resetPlayerBoard() {
 }
 
 export function attemptShipPlacement (row, col) {
-    const player = gameState.players[gameState.currentPlayer];
+    const player = getCurrentPlayer();
     const shipReference = getActiveShipFromPlayerFleet(player);
     
     try{    
@@ -92,7 +92,7 @@ function executeRandomPlacement(player, updateUi = false) {
 //Used for the placeRandomFleet BTN
 export function randomizeHumanFleet () {
     resetPlayerBoard()
-    const player = gameState.players[gameState.currentPlayer]
+    const player = getCurrentPlayer()
     executeRandomPlacement(player, true)
     gameState.activeShip = null;
     if(isPlacementCompleted(player)) enableConfirmBtn();
@@ -100,7 +100,7 @@ export function randomizeHumanFleet () {
 
 //Used as a random fleet placement for the CPU
 export function randomizeComputerFleet () {
-    const player = gameState.players[gameState.currentPlayer]
+    const player = getCurrentPlayer()
     executeRandomPlacement(player);
     gameState.activeShip = null;
 }
@@ -116,7 +116,7 @@ export function isPlacementCompleted (player) {
 }
 
 export function handlePlacementHover (row, col) {
-    const player = gameState.players[gameState.currentPlayer];
+    const player = getCurrentPlayer();
     const ship = getActiveShipFromPlayerFleet(player);
 
     if(!ship) return;
@@ -134,7 +134,7 @@ export function handlePlacementHover (row, col) {
 }
 
 export function handlePlacementDrop (row, col){
-    const player = gameState.players[gameState.currentPlayer];
+    const player = getCurrentPlayer();
     resetHighlightPlacement(player.id);
     attemptShipPlacement(row, col);
     if(isPlacementCompleted(player)) enableConfirmBtn();
