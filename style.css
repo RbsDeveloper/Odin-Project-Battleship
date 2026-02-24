@@ -90,3 +90,38 @@ main {
     background-color: lightcoral;
     border-color: red;
 }
+
+.shipCard {
+    border: 1px solid black;
+    border-radius: .7rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.shipHp {
+    display: flex;
+    justify-content: start;
+}
+
+.hpPoint {
+    background-color: green;
+    width: 15px;
+    height: 15px;
+    margin-right: .25em;
+    border-radius: .25rem;
+}
+
+.hit {
+    background-color: tomato;
+}
+
+.sunk {
+    background-color: red;
+}

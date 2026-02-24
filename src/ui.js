@@ -58,14 +58,14 @@ export function removeSecondPlayerInput () {
 }
 
 //FUNCTION THAT CREATES THE GAME SCREEN OR ARENA
-export function renderGameScreen () {
+export function renderGameScreen (players) {
     const mainContainer = createCompleteElement("main", [], "",);
     const messageContainer = createCompleteElement("div", ["msgContainer"], "", {id: "msgWrapper"});
     const interactiveArea = createCompleteElement("div", ["interactiveContainer"], "", {id: "interactiveZone"})
 
-    const leftFleetContainer = createCompleteElement("div", ["fleetContainer"], "", {id: "leftFleet"});
+    const leftFleetContainer = createCompleteElement("div", ["fleetContainer"], "", {id: "leftFleet", "data-player-id": `${players[0].id}`});
     const middleContainer = createCompleteElement("div", ["gameboardsContainer"], "", {id: "boardsArea"})
-    const rightFleetContainer = createCompleteElement("div", ["fleetContainer"],"", {id: "rightFleet"});
+    const rightFleetContainer = createCompleteElement("div", ["fleetContainer"],"", {id: "rightFleet", "data-player-id": `${players[1].id}`});
     
     interactiveArea.append(leftFleetContainer, middleContainer, rightFleetContainer);
     mainContainer.append(messageContainer, interactiveArea);
@@ -110,7 +110,7 @@ export function createShipPlacementUi  (identityParam) {
     const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {"data-player-id": `${identityParam}`});
     const placementControls = createCompleteElement("div", ["btnContainer"], "", {"data-player-id": `${identityParam}`});
 
-    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "Horizontal", {id: "shipDirectionBtn"});
+    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "horizontal", {id: "shipDirectionBtn"});
     const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement", {id: "randomPlacementBtn"});
     const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
 
@@ -252,3 +252,46 @@ export function updateGameMessage (message){
     const messageElement = createCompleteElement("p", ["gameMsg"], `${message}`, {id: "msgText"});
     msgContainer.append(messageElement);
 }
+
+export function renderFleetStatus (owner, destination ) {
+    //const wrapper = createCompleteElement("div", ["fleetStatusWrapper"])
+    const title = createCompleteElement("h3", ["fleetTitle"], `${owner.id}'s Fleet`,);
+    const shipConstructionPlans = owner.getBoard().shipDetailsForCreation;
+    console.log(shipConstructionPlans)
+    destination.append(title)
+
+    shipConstructionPlans.forEach(ship => {
+            destination.append(createShipCard(ship))
+    })
+    
+}
+
+function createShipCard (shipReference) {
+    const card = createCompleteElement("div", ["shipCard"], "", {"data-ship-id": `${shipReference.id}`});
+    const header = createCompleteElement("div", ["cardHeader"]);
+    const shipName = createCompleteElement("h4", ["shipName"], `${shipReference.id}`);
+    const hpPoints = createCompleteElement("span", ["hpPoints"], `${shipReference.length}`);
+    const shipContainer = createCompleteElement("div", ["shipHp"]);
+    createHitPoints(shipReference.length, shipContainer);
+
+    header.append(shipName, hpPoints);
+    card.append(header, shipContainer);
+
+    return card;
+}
+
+function createHitPoints(length, destination){
+    for(let i = 0; i< length; i++){
+        destination.append(createCompleteElement("div", ["hpPoint"]))
+    }
+}
+
+export function updateShipCard (hpNum, healthPointsDivs) {
+    const currentHp = parseInt(hpNum.textContent) - 1;
+    hpNum.textContent = currentHp;
+    healthPointsDivs[parseInt(hpNum.textContent)].classList.add("hit")
+    if(currentHp === 0){
+        hpNum.closest(".shipCard").classList.add("sunk")
+    }
+}
+
