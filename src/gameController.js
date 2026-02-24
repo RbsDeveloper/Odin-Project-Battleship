@@ -111,7 +111,7 @@ export function handleBoardClick(targetEl) {
 
 export function initializePlacementUI () {
     const fleetContainer = document.getElementById("fleetPlacementControls");
-    fleetContainer.append(createShipPlacementUi(getCurrentPlayer().id));
+    fleetContainer.append(createShipPlacementUi(getCurrentPlayer().id, gameState.shipDirection));
     const fleetContainerSelector = document.querySelector(`.shipContainer[data-player-id = '${getCurrentPlayer().id}']`);
     buildShip(getCurrentPlayer().getBoard().shipDetailsForCreation, fleetContainerSelector);
     loadPlacementContainer();

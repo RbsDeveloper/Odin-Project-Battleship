@@ -105,12 +105,12 @@ export function buildShip (shipDetails, destination) {
     })   
 }
 //creates the container where the ships and btn controlls are stored for placement
-export function createShipPlacementUi  (identityParam) {
+export function createShipPlacementUi  (identityParam, direction) {
     const placementContainer = createCompleteElement("div", ["placementContainer"]);
     const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {"data-player-id": `${identityParam}`});
     const placementControls = createCompleteElement("div", ["btnContainer"], "", {"data-player-id": `${identityParam}`});
 
-    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , "horizontal", {id: "shipDirectionBtn"});
+    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , `${direction}`, {id: "shipDirectionBtn"});
     const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement", {id: "randomPlacementBtn"});
     const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
 
