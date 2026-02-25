@@ -1,3 +1,4 @@
+import { gameState } from "./gameState.js";
 import { createCompleteElement } from "./utils.js";
 
 //FUNCTION THAT CREATES THE START GAME DIALOG
@@ -293,5 +294,22 @@ export function updateShipCard (hpNum, healthPointsDivs) {
     if(currentHp === 0){
         hpNum.closest(".shipCard").classList.add("sunk")
     }
+}
+
+export function showHumanShips () {
+    const player =gameState.players[0]
+    const humanGrid = player.getBoard().grid;
+    const boardEl = document.querySelector(`.board[data-player-id="${player.id}"]`)
+
+    if(!boardEl)return 
+
+    humanGrid.forEach((row, i) => {
+        row.forEach((cell, j) => {
+            if(cell.hasShip){
+                const cellEl = document.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
+                if(cellEl) cellEl.classList.add("ship-placed")
+            }
+        })
+    })
 }
 

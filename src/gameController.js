@@ -1,4 +1,4 @@
-import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard } from "./ui.js";
+import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard, showHumanShips } from "./ui.js";
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener } from "./events.js";
 import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
@@ -90,7 +90,8 @@ function enterGamePhase () {
     gameState.currentPlayer = 0;
     updateGameMessage(`Battle commenced! ${getCurrentPlayer().id}, take the first shot.`);
     if(gameState.settings.mode === 'pvc'){
-        singlePlayerMatch()
+        singlePlayerMatch();
+        showHumanShips()
     }else{
         pvpMatch()
     }
@@ -186,7 +187,7 @@ async function computerAttack () {
         const resultOfTheAttack = opponentPlayer.getBoard().receiveAttack([computerAttackCoords.row, computerAttackCoords.col]);
        
         playSound('fire')   
-        const targetCell = humanBoard.querySelector(`.cell[data-row = "${computerAttackCoords.row}"][data-col = "${computerAttackCoords.col}"]`)
+        const targetCell = humanBoard.querySelector(`.cell[data-row = "${computerAttackCoords.row}"][data-col = "${computerAttackCoords.col}"]`);
        
         await delayActions(1000)
         playSound(resultOfTheAttack)
@@ -204,8 +205,6 @@ async function computerAttack () {
              updateShipsHp(opponentPlayer, computerAttackCoords.row, computerAttackCoords.col)
         }
 
-    
-    
     await delayActions(500)
     if(checkLoss(opponentPlayer)){
         triggerPhase("winner");
