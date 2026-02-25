@@ -24,17 +24,21 @@ export function Player (type, id) {
         const possibleEnemyShipPosition = [];
 
         player.getNextMove = function () {
-            if(possibleEnemyShipPosition.length > 0){
-                const nextTarget = possibleEnemyShipPosition.pop();
-               
-                const index = computerAttackOptions.findIndex(coord => coord.row === nextTarget.row && coord.col === nextTarget.col);
-                if(index !== -1) computerAttackOptions.splice( index, 1)
-               
-                return nextTarget;
-            }else{
-                return computerAttackOptions.pop();
+            while(true){
+                let nextTarget
+
+                if(possibleEnemyShipPosition.length > 0){
+                    nextTarget = possibleEnemyShipPosition.pop();
+                
+                    const index = computerAttackOptions.findIndex(coord => coord.row === nextTarget.row && coord.col === nextTarget.col);
+                    if(index !== -1) computerAttackOptions.splice( index, 1)
+                
+                    return nextTarget;
+                }else{
+                    return computerAttackOptions.pop();
+                }
             }
-           
+
         }
 
         player.addAdjacentCells = function (coords) {
