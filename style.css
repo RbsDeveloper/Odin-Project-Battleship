@@ -21,6 +21,9 @@
 
     /* Borders */
     --border: rgba(255, 255, 255, 0.1);
+
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 
+               Consolas, "Liberation Mono", "Courier New", monospace;
 }
 /* Reset*/
 
@@ -73,6 +76,7 @@ h1, h2, h3, h4, h5, h6 {
 body {
     /* background: linear-gradient(315deg, #1F3B8A, #0F182A); */
     background: linear-gradient(to bottom right, #0f172a, #1e293b, #1e3a8a);
+    font-family: var(--font-mono);
     min-block-size: 100vh;
     margin: 0;
     display: flex;
@@ -86,6 +90,90 @@ main {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+.startingDialog {
+    background-color: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.gameLogo {
+    font-size: 3rem;
+    color: var(--miss);
+    margin-bottom: .5em;
+}
+
+.gameTitle {
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: .25rem;
+    font-size: 4rem;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .1rem;
+    font-size: .65rem;
+
+}
+
+.startGameBtn {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--primary);
+    border: 1px solid var(--miss);
+    border-radius: .250em;
+    color: var(--text-main);
+    text-transform: uppercase;
+    font-size: .85rem;
+    letter-spacing: .15rem;
+    padding-inline: 3em;
+    padding-block: .75em;
+    margin-block: 2em;
+    z-index: 1;
+    transition: all 0.2s
+}
+
+.startGameBtn::before,
+.startGameBtn::after {
+    content: "";
+    position: absolute;
+    width: 6px;  /* Length of the L-shape */
+    height: 6px;
+}
+
+/* The Top-Left Corner */
+.startGameBtn::before {
+  top: 4px;    /* Slightly outside the button */
+  left: 4px;
+  border-top: 2px solid var(--miss);  /* Your Accent Blue */
+  border-left: 2px solid var(--miss);
+}
+
+/* The Bottom-Right Corner */
+.startGameBtn::after {
+  bottom: 4px;
+  right: 4px;
+  border-bottom: 2px solid var(--miss);
+  border-right: 2px solid var(--miss);
+}
+
+.startGameBtn:hover {
+    transform: scale(1.05);
+    background-color: var(--primary-hover);
+    filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.8));
+    cursor: pointer;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 
+               0 0 10px rgba(37, 99, 235, 0.8);
+}
+
+.startGameBtn:active {
+    transform: scale(0.96);
 }
 
 .board {
