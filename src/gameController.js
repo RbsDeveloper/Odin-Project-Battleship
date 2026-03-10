@@ -1,4 +1,4 @@
-import { startDialog, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard, showHumanShips, createLobby, createSecondPlayerGroup, removeSecondPlayerGroup } from "./ui.js";
+import { startDialog, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard, showHumanShips, createLobby, createSecondPlayerGroup, removeSecondPlayerGroup, updateDirectionButtons } from "./ui.js";
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener, setUpModeToggle, attachValidationListener } from "./events.js";
 import { createPlayers,} from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
@@ -169,11 +169,16 @@ export function fireActionBasedOnBtnTarget (targetBtnId) {
     if(gameState.gamePhase !== "placement") return;
 
     switch(targetBtnId) {
-        case "shipDirectionBtn": 
+        case "horizBtn": 
             changeShipDirection(); 
-            const direction = gameState.shipDirection;
-            updateGameMessage(`Rotation: ${direction}.`)
+            updateDirectionButtons(gameState.shipDirection);
+            updateGameMessage(`Rotation: ${gameState.shipDirection}.`)
             break;
+        case "vertBtn": 
+            changeShipDirection();
+            updateDirectionButtons(gameState.shipDirection); 
+            updateGameMessage(`Rotation: ${gameState.shipDirection}.`)
+            break;        
         case "randomPlacementBtn": 
             randomizeHumanFleet(); 
             updateGameMessage("Fleet deployed randomly!")
