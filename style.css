@@ -121,6 +121,10 @@ main {
 
 }
 
+.btn {
+    transition: all 0.2s;
+}
+
 .startGameBtn {
     position: relative;
     overflow: hidden;
@@ -135,7 +139,6 @@ main {
     padding-block: .75em;
     margin-block: 2em;
     z-index: 1;
-    transition: all 0.2s
 }
 
 .startGameBtn::before,
@@ -174,6 +177,235 @@ main {
 
 .startGameBtn:active {
     transform: scale(0.96);
+}
+
+.startingDialog .subtitle {
+    color: var(--miss);
+    letter-spacing: .2rem;
+}
+
+.lobbyTitle {
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    margin-bottom: 2rem;
+}
+
+.settingsForm {
+    background-color: color-mix(in srgb, var(--bg-main) 50%, transparent);
+    opacity: .7;
+    padding: 1.25em;
+    border-radius: .25em;
+    position: relative;
+}
+
+.settingsForm::before,
+.settingsForm::after {
+    content: "";
+    position: absolute;
+    width: 12px;  
+    height: 12px;
+}
+
+/* The Top-Left Corner */
+.settingsForm::before {
+  top: 4px;    
+  left: 4px;
+  border-top: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);  /* Your Accent Blue */
+  border-left: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);
+}
+
+/* The Bottom-Right Corner */
+.settingsForm::after {
+  bottom: 4px;
+  right: 4px;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);
+  border-right: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);
+}
+
+.sectionLabel {
+    color: var(--text-muted);
+    font-size: .65rem;
+    text-transform: uppercase;
+    letter-spacing: .2rem;
+    margin-bottom: 1em;
+}
+
+.modeOptions {
+    display: flex;
+    gap: .5em;
+    margin-bottom: 1em;
+}
+
+.modeCardBtn {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: .250em;
+    border: 1px solid var(--border);
+    background-color: var(--bg-primary);
+    padding: 1.25em;
+}
+
+.modeIcon {
+    font-size: 1rem;
+    inline-size: 1rem;
+    block-size: 1rem;
+    border-radius: .250em;
+    color: var(--text-muted);
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-panel);
+    margin-bottom: .75em;
+}
+
+.modeTag {
+    color: var(--text-muted);
+    font-size: .75rem;
+    text-transform: uppercase;
+}
+
+.modeTitle {
+    color: var(--text-main);
+}
+
+.modeDescription {
+    color: var(--text-muted);
+    font-size: .70rem;
+}
+
+.modeCardBtn.activeMode {
+    background-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    border-color: var(--miss);  
+}
+
+.modeCardBtn.activeMode .modeIcon {
+    background-color: var(--primary);
+    color: var(--text-main);
+}
+
+.modeCardBtn.activeMode .modeTag {
+    color: var(--miss);
+}
+
+.modeCardBtn.activeMode::before,
+.modeCardBtn.activeMode::after {
+    content: "";
+    position: absolute;
+    width: 6px;  /* Length of the L-shape */
+    height: 6px;
+}
+
+/* The Top-Left Corner */
+.modeCardBtn.activeMode::before {
+  top: 4px;    /* Slightly outside the button */
+  left: 4px;
+  border-top: 2px solid var(--miss);  /* Your Accent Blue */
+  border-left: 2px solid var(--miss);
+}
+
+/* The Bottom-Right Corner */
+.modeCardBtn.activeMode::after {
+  bottom: 4px;
+  right: 4px;
+  border-bottom: 2px solid var(--miss);
+  border-right: 2px solid var(--miss);
+}
+
+.inputGroup {
+    position: relative;
+}
+
+.inputGroup input {
+    inline-size: 100%;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: .25em;
+    padding: .75em;
+    padding-left: 2.5em;
+    font-size: .8rem;
+    color: var(--text-main);
+    margin-bottom: .5em
+}
+
+.inputGroup::before {
+    content: "";
+    position: absolute;
+    left: .5em;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+
+    background-color: var(--text-muted);
+    -webkit-mask-image: url('assets/icons/user-regular-full.svg');
+    mask-image: url('assets/icons/user-regular-full.svg');
+    mask-repeat: no-repeat;
+    mask-size: contain;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.formSubmitBtn {
+    position: relative;
+    margin-top: 1.75em;
+    inline-size: 100%;
+    border: 1px solid var(--bg-panel);
+    background-color: var(--bg-main);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: .8rem;
+    letter-spacing: .125rem;
+    padding: .75em;
+    border-radius: .25em
+}
+
+.formSubmitBtn:disabled {
+    animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+.submitReady {
+    background-color: var(--primary);
+    color: var(--text-main);
+}
+
+.formSubmitBtn.submitReady::before,
+.formSubmitBtn.submitReady::after {
+    content: "";
+    position: absolute;
+    width: 6px;  
+    height: 6px;
+}
+
+/* The Top-Left Corner */
+.formSubmitBtn.submitReady::before {
+  top: 4px;    
+  left: 4px;
+  border-top: 2px solid var(--miss);  /* Your Accent Blue */
+  border-left: 2px solid var(--miss);
+}
+
+/* The Bottom-Right Corner */
+.formSubmitBtn.submitReady::after {
+  bottom: 4px;
+  right: 4px;
+  border-bottom: 2px solid var(--miss);
+  border-right: 2px solid var(--miss);
+}
+
+.formSubmitBtn.submitReady:hover {
+    transform: scale(1.025);
+    background-color: var(--primary-hover);
+}
+
+.formSubmitBtn.submitReady:active {
+    transform: scale(0.9750);
 }
 
 .board {
@@ -306,4 +538,9 @@ main {
     border: 1px solid var(--border);
     border-radius: .5em;
     padding: .5em;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px 4px rgba(37, 99, 235, 0.15); }
+  50%       { box-shadow: 0 0 25px 8px rgba(37, 99, 235, 0.5); }
 }
