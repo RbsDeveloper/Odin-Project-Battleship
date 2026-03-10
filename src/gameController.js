@@ -1,6 +1,6 @@
-import { startDialog, insertSettingsForm, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard, showHumanShips } from "./ui.js";
-import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener } from "./events.js";
-import { createPlayers, toggleSecondPlayerInput } from "./playerSetup.js";
+import { startDialog, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard, showHumanShips, createLobby, createSecondPlayerGroup, removeSecondPlayerGroup } from "./ui.js";
+import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener, setUpModeToggle, attachValidationListener } from "./events.js";
+import { createPlayers,} from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
 import { gameState, getBoards, getCurrentPlayer, opponentIndex, resetGameState } from "./gameState.js";
 import { delayActions } from "./utils.js";
@@ -46,12 +46,58 @@ function handleSubmitClick (e) {
     triggerPhase("placement");
 }
 
+function manageLobbyInternals (e) {
+    const btnEl = e.target.closest("button");
+        const hiddenInput = document.getElementById("modeInput");
+
+        if(!btnEl) return;
+
+        const btnsCollection = document.querySelectorAll(".modeCardBtn");
+        btnsCollection.forEach(b => b.classList.remove("activeMode"))
+
+        btnEl.classList.add("activeMode");
+        hiddenInput.value = btnEl.dataset.mode;
+
+        if (hiddenInput.value === "pvp"){
+            if(!document.getElementById("secondPlayerInput")) {
+
+                const playersSection = document.querySelector(".playersSection")
+                //document.getElementById("firstPlayerInput").placeholder = "Player 1 Name"
+                playersSection.append(createSecondPlayerGroup())
+            }
+        }else{
+            //document.getElementById("firstPlayerInput").placeholder = "Your callsign"
+            removeSecondPlayerGroup()
+        }
+}
+
+function handleFormValidation (e) {
+    const form = e.currentTarget;
+    const submitBtn = document.querySelector(".formSubmitBtn");
+
+    if(form.checkValidity()){
+        submitBtn.disabled = false;
+        submitBtn.classList.add("submitReady");
+    }else{
+        submitBtn.disabled = true;
+        submitBtn.classList.remove("submitReady")
+    }
+}
+
+function handleLobbyGameModeSwitch () {
+    const btnWrapper = document.querySelector(".modeOptions");
+    setUpModeToggle(btnWrapper, manageLobbyInternals)
+}
+
 function enterSettingsPhase () {
     const modal = document.getElementById("startingWindow");
-    const formElement = insertSettingsForm();
-    modal.append(formElement);
-    toggleSecondPlayerInput();
-    attachFormEventListener(formElement, handleSubmitClick);
+    modal.innerHTML = "";
+    const lobby = createLobby();
+    lobby.forEach(el => modal.append(el))
+    handleLobbyGameModeSwitch()
+    const form = modal.querySelector("form");
+    attachValidationListener(form, handleFormValidation);
+    attachFormEventListener(form, handleSubmitClick);
 }
 
 function handlePlacementConfirmation() {
@@ -91,7 +137,7 @@ function enterGamePhase () {
     updateGameMessage(`Battle commenced! ${getCurrentPlayer().id}, take the first shot.`);
     if(gameState.settings.mode === 'pvc'){
         singlePlayerMatch();
-        showHumanShips()
+        showHumanShips( )
     }else{
         pvpMatch()
     }

@@ -19,50 +19,87 @@ export function startDialog () {
     return dialogEl
 }
 
-//FUNCTION THAT CREATES THE SETTINGS GAME DIALOG
-export function insertSettingsForm () {
-    const formEl = createCompleteElement("form", ["settingsForm"], "", {id: "gameSettingsForm"});
+// new gameMode form architechture
 
-    //elements inside the form
+export function createLobby () {
+    const subtitle = createCompleteElement("h4", ["subtitle"], "naval command system");
+    const title = createCompleteElement("h2", ["lobbyTitle"], "Mission briefing");
 
-    //radio inputs for players
-    const gameModeFieldset = createCompleteElement('fieldset', ["btnFieldset"], "", {id: "btnFieldset"});
-    const legend =  createCompleteElement('legend', [], "Choose your opponent")
-    const firstLabel = createCompleteElement("label", [], "Player vs Computer", {for: "pvcMode"});
-    const firstInput = createCompleteElement("input", [], "", {type: "radio", value: "pvc", id: "pvcMode", name: "mode",});
-    firstInput.checked = true;
-    const secondLabel = createCompleteElement("label", [], "Player vs Player", {for: "pvpMode"});
-    const secondInput = createCompleteElement("input", [], "", {type: "radio", value: "pvp", id: "pvpMode", name: "mode",});
+    const formEl = createCompleteElement("form", ["settingsForm"], "", {id: "btnFieldset"});
+    const gameModeSection = createCompleteElement("section", ["modeSection"]);
+    const gameModeLabel = createCompleteElement("p", ["sectionLabel"], "01 - Select Game Mode");
+    const modeOptionsWrapper = createCompleteElement("div", ["modeOptions"]);
 
-    gameModeFieldset.append(legend, firstLabel, firstInput, secondLabel, secondInput);
+    const pvcBtn = createModeBtn(
+        '<i class="fa-solid fa-desktop"></i>', 
+        "solo", 
+        "vs Computer", 
+        "Challenge the AI opponent", 
+        "pvc"
+    );
 
-    //Name input
-    const fieldSetForNames = createCompleteElement("fieldset", ['pnFieldset'], "", {id: "nameFieldset"})
-    const thirdLabel = createCompleteElement("label", [], "Player name:", {for: "firstPlayerInput"});
-    const nameInput = createCompleteElement("input", [], "", {type: "text", name: "firstPlayerName", id:"firstPlayerInput",});
-    nameInput.required = true;
-    fieldSetForNames.append(thirdLabel, nameInput);
+    const pvpBtn = createModeBtn(
+        '<i class="fa-solid fa-user-group"></i>', 
+        "local", 
+        "vs Player", 
+        "Pass & play on a device", 
+        "pvp"
+    );
+    
+    modeOptionsWrapper.append(pvcBtn, pvpBtn);
 
-    const submitBtn = createCompleteElement("button", ["btn", "formSubmitBtn"], "Next", {type: "submit"});
+    const hiddenInput = createCompleteElement("input", [], "", {type: "hidden", id: "modeInput", name: "mode", value: "pvc"});
+    gameModeSection.append(gameModeLabel, modeOptionsWrapper, hiddenInput);
 
-    formEl.append(gameModeFieldset, fieldSetForNames, submitBtn);
+    const playersInfoSection = createCompleteElement("section", ["playersSection"]);
+    const playerInfoLabel = createCompleteElement("p", ["sectionLabel"], "02 - Commander");
 
-    return formEl;
+    const firstPlayerGroup = createCompleteElement("div", ["inputGroup"]);
+    const firstPlayerLabel = createCompleteElement("label", [], "", {for:"firstPlayerInput"});
+    const firstPlayerNameInput = createCompleteElement("input", [], "", {type: "text", name: "firstPlayerName", id:"firstPlayerInput", placeholder:"Your callsign", required: true, autocomplete: "off"});
 
+    firstPlayerGroup.append(firstPlayerLabel, firstPlayerNameInput);
+    playersInfoSection.append(playerInfoLabel, firstPlayerGroup);
+
+    const submitBtn = createCompleteElement("button", ["btn", "formSubmitBtn"], "Deploy fleet", {type: "submit", disabled: true});
+
+    formEl.append(gameModeSection, playersInfoSection, submitBtn);
+
+    return [subtitle, title, formEl];
 }
-//FUNCTION THAT CREATES AND INSERTS THE SECOND NAME INPUT BASED ON THE GAME MODE
-export function createSecondPlayerInput () {
-    const nameFieldset = document.getElementById("nameFieldset");
 
-    const label = createCompleteElement("label", [], "Second player name:", {id: "secondPlayerLabel", for: "secondPlayerInput"});
-    const secondNameInput = createCompleteElement("input", [], "", {type: "text", id:"secondPlayerInput", name: "secondPlayerName",})
-    secondNameInput.required = true;
-    nameFieldset.append(label, secondNameInput);
+export function createSecondPlayerGroup () {
+    const secondPlayerGroup = createCompleteElement("div", ["inputGroup"]);
+    const secondPlayerLabel = createCompleteElement("label", [], "", {for:"secondPlayerInput"});
+    const secondPlayerNameInput = createCompleteElement("input", [], "", {type: "text", name: "secondPlayerName", id:"secondPlayerInput", placeholder:"Player 2 name", required: true, autocomplete: "off"});
+    secondPlayerGroup.append(secondPlayerLabel, secondPlayerNameInput);
+    
+    return secondPlayerGroup
 }
-//FUNCTION THAT REMOVES THE SECOND NAME INPUT
-export function removeSecondPlayerInput () {
-     document.getElementById("secondPlayerLabel")?.remove();
-     document.getElementById("secondPlayerInput")?.remove();
+
+function createModeBtn(iconHtml, tag, title, desc, modeValue) {
+    const btn = createCompleteElement("button", ["modeCardBtn"], "", { 
+        type: "button", 
+        "data-mode": modeValue 
+    });
+
+    if(modeValue === "pvc"){
+        btn.classList.add("activeMode")
+    }
+
+    const btnIcon = createCompleteElement("div", ["modeIcon"],);
+    btnIcon.innerHTML = iconHtml;
+    const modeTag = createCompleteElement("span", ["modeTag"], tag);
+    const modeTitle = createCompleteElement("span", ["modeTitle"], title);
+    const modeDescription = createCompleteElement("span", ["modeDescription"], desc);
+
+    btn.append(btnIcon, modeTag, modeTitle, modeDescription);
+    return btn;
+}
+
+export function removeSecondPlayerGroup () {
+    const input = document.getElementById("secondPlayerInput")
+    if(input) input.closest(".inputGroup").remove()
 }
 
 //FUNCTION THAT CREATES THE GAME SCREEN OR ARENA
@@ -319,4 +356,3 @@ export function showHumanShips () {
         })
     })
 }
-

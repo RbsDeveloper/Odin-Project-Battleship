@@ -1,4 +1,3 @@
-
 export function attachStartBtnLister (element, callback) {
     element.addEventListener("click", callback)
 }
@@ -89,4 +88,12 @@ export function attachDropEvent (element, callback) {
         const cellCol = parseInt(cell.dataset.col);
         callback(cellRow, cellCol)
     })
+}
+
+export function setUpModeToggle (element, callback) {
+    element.addEventListener("click", callback)
+}
+
+export function attachValidationListener (element, callback){
+    element.addEventListener("input", callback);
 }
