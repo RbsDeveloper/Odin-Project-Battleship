@@ -135,8 +135,7 @@ export function renderPlacementScreen () {
 
     const fleetPlacementContainer = createCompleteElement("div", ["fleetContainer"], "", {id: "fleetPlacementControls"});
     const gridContainer = createCompleteElement("div", ["placementBoardContainer"], "", {id: "placementArea"})
-    const confirmPlacementBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Confirm Placement", {id: "confirmPlacementBtn", disabled: true});
-    interactiveArea.append(fleetPlacementContainer, gridContainer, confirmPlacementBtn);
+    interactiveArea.append(fleetPlacementContainer, gridContainer);
     mainContainer.append(messageContainer, interactiveArea);
 
     return mainContainer;
@@ -145,24 +144,81 @@ export function renderPlacementScreen () {
 export function buildShip (shipDetails, destination) {
 
     shipDetails.forEach(item => {
-        const build = createCompleteElement("div", ["ship"], `${item.id}`, {id: `${item.id}`, draggable: true});
+        const build = createCompleteElement("div", ["ship"], "", {id: `${item.id}`, draggable: true});
+        build.innerHTML = `<span class="dot"></span> <span class="shipName">${item.id}</span>`
+        const sizeWrapper = createCompleteElement("div", ["sizeWrapper"]);
+        const sizeBar = createCompleteElement("div", ["sizeBar"]);
+        const multiplier = createCompleteElement("span", ["multiplier"], `x${item.length}`);
+        sizeWrapper.append(sizeBar, multiplier);
+        for(let i=0; i<item.length; i++){
+            sizeBar.appendChild(createCompleteElement("div", ["sizeBlock"]))
+        }
+        build.append(sizeWrapper)
         destination.append(build);
     })   
 }
 //creates the container where the ships and btn controlls are stored for placement
-export function createShipPlacementUi  (identityParam, direction) {
+export function createShipPlacementUi  (identityParam) {
     const placementContainer = createCompleteElement("div", ["placementContainer"]);
     const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {"data-player-id": `${identityParam}`});
+    const separator = createCompleteElement("hr", ["separator"]);
     const placementControls = createCompleteElement("div", ["btnContainer"], "", {"data-player-id": `${identityParam}`});
 
-    const rotateShipsBtn = createCompleteElement("button", ["btn", "directionBtn"] , `${direction}`, {id: "shipDirectionBtn"});
-    const randomPlacementBtn = createCompleteElement("button", ["btn", "randomBtn"], "Random placement", {id: "randomPlacementBtn"});
-    const resetPlacementBtn = createCompleteElement("button", ["btn", "resetBtn"], "Reset", {id: "resetBtn"});
+    //SECTION 02: ORIENTATION
 
-    placementControls.append(rotateShipsBtn, randomPlacementBtn, resetPlacementBtn);
-    placementContainer.append(fleetSelector, placementControls);
+    const section02 = createCompleteElement("div", ["uiSection"]);
+    const orientationLabel = createCompleteElement("p", ["sectionLabel"], "02 - Orientation");
+    const orientationBtnsGroup = createCompleteElement("div", ["controlGroup"]);
+
+    const horizontalBtn = createCompleteElement("button", ["controlBtn"], "Horiz", {id:"horizBtn"})
+    horizontalBtn.prepend(createCompleteElement("i", ["fa-solid", "fa-arrow-right"]));
+    const verticalBtn = createCompleteElement("button", ["controlBtn"], "Vert", {id:"vertBtn"})
+    verticalBtn.prepend(createCompleteElement("i", ["fa-solid", "fa-arrow-down"]));
+    if(gameState.shipDirection==='horizontal'){
+        horizontalBtn.classList.add("active");
+    }else if (gameState.shipDirection==="vertical"){
+        verticalBtn.classList.add("active");
+    }
+
+    orientationBtnsGroup.append(horizontalBtn, verticalBtn);
+    section02.append(orientationLabel, orientationBtnsGroup);
+
+    //SECTION 03: ACTIONS 
+
+    const section03 = createCompleteElement("div", ["uiSection"]);
+    const actionsLabel = createCompleteElement("div", ["sectionLabel"], "03 - Actions");
+    const actionsBtnsGroup = createCompleteElement("div", ["controlGroup"]);
+
+    const randomBtn = createCompleteElement("button", ["actionBtn"], "Random", {id: "randomPlacementBtn"});
+    randomBtn.prepend(createCompleteElement("i", ["fa-solid", "fa-shuffle"]))
+    const resetBtn = createCompleteElement("button", ["actionBtn"], "Clear", {id: "resetBtn"});
+    resetBtn.prepend(createCompleteElement("i", ["fa-solid", "fa-trash-can"]))
+
+    actionsBtnsGroup.append(randomBtn, resetBtn);
+    section03.append(actionsLabel, actionsBtnsGroup);
+
+    //LAUNCH GAME WRAPPER
+
+    const launchWrapper = createCompleteElement("div", ["launchWrapper"]);
+    const launchBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Launch Battle", {id: "confirmPlacementBtn", disabled: true});
+    launchWrapper.append(launchBtn);
+    placementControls.append(section02, section03, launchWrapper);
+    placementContainer.append(fleetSelector, separator, placementControls);
 
     return placementContainer
+}
+
+export function updateDirectionButtons(activeDirection) {
+    const horizBtn = document.getElementById('horizBtn');
+    const vertBtn = document.getElementById('vertBtn');
+
+    if (activeDirection === 'horizontal') {
+        horizBtn.classList.add('active');
+        vertBtn.classList.remove('active');
+    } else {
+        vertBtn.classList.add('active');
+        horizBtn.classList.remove('active');
+    }
 }
 
 export function renderGameboard (grid) {
@@ -227,12 +283,14 @@ export function resetFleetUi (playerId) {
 
 export function enableConfirmBtn () {
     const confirmBtn = document.getElementById("confirmPlacementBtn");
-    confirmBtn.disabled = false
+    confirmBtn.disabled = false;
+    confirmBtn.classList.add("confirmReady")
 }
 
 export function disableConfirmBtn () {
     const confirmBtn = document.getElementById("confirmPlacementBtn");
     if(!confirmBtn.disabled) confirmBtn.disabled = true;
+    if(confirmBtn.classList.contains("confirmReady")) confirmBtn.classList.remove("confirmReady")
 }
   
 export function clearPlacementComponents () {
