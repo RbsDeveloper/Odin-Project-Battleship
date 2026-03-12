@@ -20,13 +20,10 @@ export function getActiveShipFromPlayerFleet (player) {
 }
 
 export function changeShipDirection() {
-    const btn = document.querySelector(".directionBtn");
     if(gameState.shipDirection === 'horizontal'){
         gameState.shipDirection = 'vertical';
-        btn.innerText = 'vertical'
-    }else{
+    }else if (gameState.shipDirection === 'vertical'){
         gameState.shipDirection = "horizontal";
-        btn.innerText = "horizontal"
     }
 }
 
@@ -38,11 +35,18 @@ export function resetPlayerBoard() {
     resetFleetUi(player.id)
     disableConfirmBtn()
     gameState.activeShip = null;
+    gameState.shipDirection = "horizontal"
 }
 
 export function attemptShipPlacement (row, col) {
     const player = getCurrentPlayer();
     const shipReference = getActiveShipFromPlayerFleet(player);
+
+    if (!shipReference) {
+        updateGameMessage("TACTICAL ERROR: Select a ship from the fleet manifest first.");
+        console.warn("Placement attempted without an active ship.");
+        return; // Stop execution here
+    }
     
     try{    
         console.log(shipReference, gameState.shipDirection, [row, col])
