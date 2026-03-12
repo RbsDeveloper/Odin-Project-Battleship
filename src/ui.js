@@ -130,7 +130,15 @@ export function createPlayerBoardsArea  (boardsData) {
 
 export function renderPlacementScreen () {
     const mainContainer = createCompleteElement("main", [], "",);
-    const messageContainer = createCompleteElement("div", ["msgContainer"], "", {id: "msgWrapper"});
+    const messageContainer = createCompleteElement("div", ["msgContainer"], "");
+
+    const messageHeader = createCompleteElement("div", ["logHeader"]);
+    messageHeader.append(
+        createCompleteElement("span", ["tacticalLabel"], "naval comms")
+    );
+    const messageBody = createCompleteElement("div", ['logBody'], "", {id: "msgWrapper"});
+    messageContainer.append(messageHeader, messageBody);
+
     const interactiveArea = createCompleteElement("div", ["interactiveContainer"], "", {id: "interactiveZone"})
 
     const fleetPlacementContainer = createCompleteElement("div", ["fleetContainer"], "", {id: "fleetPlacementControls"});
@@ -158,11 +166,23 @@ export function buildShip (shipDetails, destination) {
     })   
 }
 //creates the container where the ships and btn controlls are stored for placement
-export function createShipPlacementUi  (identityParam) {
+export function createShipPlacementUi  (identityParam, gameMode, playerIdx) {
+
+    //SECTION 01: FLEET SELECTOR
     const placementContainer = createCompleteElement("div", ["placementContainer"]);
+    const fleetLabel = createCompleteElement("p", ["sectionLabel"], "01 - Fleet Manifest")
     const fleetSelector = createCompleteElement("div", ["shipContainer"], "", {"data-player-id": `${identityParam}`});
-    const separator = createCompleteElement("hr", ["separator"]);
     const placementControls = createCompleteElement("div", ["btnContainer"], "", {"data-player-id": `${identityParam}`});
+    fleetSelector.append(fleetLabel)
+
+    //DIVIDER
+    const divider = createCompleteElement("div", ["sidebarDivider"]);
+    divider.append(
+        createCompleteElement("span",  ["line"]),
+        createCompleteElement("span", ["centerDot"]),
+        createCompleteElement("span", ["line"]),
+    );
+
 
     //SECTION 02: ORIENTATION
 
@@ -202,8 +222,9 @@ export function createShipPlacementUi  (identityParam) {
     const launchWrapper = createCompleteElement("div", ["launchWrapper"]);
     const launchBtn = createCompleteElement("button", ["btn", "confirmBtn"], "Launch Battle", {id: "confirmPlacementBtn", disabled: true});
     launchWrapper.append(launchBtn);
-    placementControls.append(section02, section03, launchWrapper);
-    placementContainer.append(fleetSelector, separator, placementControls);
+    
+    placementControls.append(divider, section02, section03, launchWrapper);
+    placementContainer.append(fleetSelector, placementControls);
 
     return placementContainer
 }
@@ -221,11 +242,19 @@ export function updateDirectionButtons(activeDirection) {
     }
 }
 
-export function renderGameboard (grid) {
+export function renderGameboard (player) {
+    
+    const boardContainer = createCompleteElement('div', ['board'], '');
+    const header = createCompleteElement('div', ["boardHeader"]);
+        header.append(
+            createCompleteElement("span", ["tacticalLabel"], "Your Fleet"),
+            createCompleteElement("h2", ["boardOwner"], `${player.id}`)
+        );
+    const gridF = createCompleteElement("div", ["gridField"], "", {'data-player-id': player.id} )
 
-    const boardContainer = createCompleteElement('div', ['board'], '', {'data-player-id': grid.id})
+    createCells(gridF, player.grid);
 
-    createCells(boardContainer, grid.grid);
+    boardContainer.append(header, gridF);
 
     return boardContainer;
 }
@@ -253,7 +282,7 @@ export function toggleActiveClassOnShips(newActive, oldShip = null) {
 
 export function markCellsOccupied (playerId, coords) {
     coords.forEach(([r , c]) => {
-        const cell = document.querySelector(`.board[data-player-id = '${playerId}'] .cell[data-row='${r}'][data-col='${c}']`)
+        const cell = document.querySelector(`.gridField[data-player-id = '${playerId}'] .cell[data-row='${r}'][data-col='${c}']`)
         cell.classList.add("ship-placed");
     })
 }
@@ -267,7 +296,7 @@ export function markShipAsPlaced (shipId) {
 }
 
 export function resetBoardUi (playerId, boardsDetails) {
-    const targetBoard = document.querySelector(`.board[data-player-id = '${playerId}']`);
+    const targetBoard = document.querySelector(`.gridField[data-player-id = '${playerId}']`);
     targetBoard.innerHTML = "";
     createCells(targetBoard, boardsDetails);
 }
@@ -330,7 +359,7 @@ export function clearWindow () {
 export function highlightPlacement (playerId, coords, isValid) {
     const className = isValid ? "preview-valid" : "preview-invalid";
     coords.forEach(([r,c]) => {
-        const cell = document.querySelector(`.board[data-player-id ='${playerId}'] .cell[data-row='${r}'][data-col='${c}']`);
+        const cell = document.querySelector(`.gridField[data-player-id ='${playerId}'] .cell[data-row='${r}'][data-col='${c}']`);
         if(cell){
             cell.classList.add(className);
         }
@@ -339,8 +368,8 @@ export function highlightPlacement (playerId, coords, isValid) {
 
 export function resetHighlightPlacement (playerId) {
     let highlightedCells = document.querySelectorAll(
-        `.board[data-player-id='${playerId}'] .cell.preview-valid,
-         .board[data-player-id='${playerId}'] .cell.preview-invalid`
+        `.gridField[data-player-id='${playerId}'] .cell.preview-valid,
+         .gridField[data-player-id='${playerId}'] .cell.preview-invalid`
         );
      
         highlightedCells.forEach(cell => {
@@ -401,7 +430,7 @@ export function updateShipCard (hpNum, healthPointsDivs) {
 export function showHumanShips () {
     const player =gameState.players[0]
     const humanGrid = player.getBoard().grid;
-    const boardEl = document.querySelector(`.board[data-player-id="${player.id}"]`)
+    const boardEl = document.querySelector(`.gridField[data-player-id="${player.id}"]`)
 
     if(!boardEl)return 
 
