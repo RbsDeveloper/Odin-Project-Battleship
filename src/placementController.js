@@ -1,6 +1,7 @@
 import { gameState, getCurrentPlayer } from "./gameState.js";
 import { getRandomCoord, getRandomDirection } from "./utils.js";
 import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn, updateGameMessage, resetHighlightPlacement, highlightPlacement } from "./ui.js";
+import { recordAndGetHistory } from "./messenger.js";
 
 export function selectShip (shipId) {
     const previousShip = gameState.activeShip && gameState.activeShip !== shipId ? gameState.activeShip : null;
@@ -9,7 +10,8 @@ export function selectShip (shipId) {
     if(!shipEl || !shipEl.classList.contains('ship')) return;
     toggleActiveClassOnShips(shipId, previousShip);
     gameState.activeShip = shipId;
-    updateGameMessage(`${shipId} selected. Awaiting deployment coordinates.`)
+    const selectionMsg = `${shipId} selected. Awaiting deployment coordinates.`;
+    updateGameMessage(recordAndGetHistory('info', selectionMsg));
 }
 
 export function getActiveShipFromPlayerFleet (player) {
@@ -43,7 +45,8 @@ export function attemptShipPlacement (row, col) {
     const shipReference = getActiveShipFromPlayerFleet(player);
 
     if (!shipReference) {
-        updateGameMessage("TACTICAL ERROR: Select a ship from the fleet manifest first.");
+        const errorMsg = "TACTICAL ERROR: SELECT A SHIP FROM THE FLEET MANIFEST FIRST.";
+        updateGameMessage(recordAndGetHistory('info', errorMsg));
         console.warn("Placement attempted without an active ship.");
         return; // Stop execution here
     }
@@ -52,7 +55,8 @@ export function attemptShipPlacement (row, col) {
         console.log(shipReference, gameState.shipDirection, [row, col])
         const placedCoords = player.getBoard().placeShip(shipReference, gameState.shipDirection, [row, col]);
         markCellsOccupied( player.id , placedCoords);
-        updateGameMessage(`Nice spot! Ship placed.`);
+        const successMsg = `${shipReference.id.toUpperCase()} DEPLOYED AT [${row},${col}].`;
+        updateGameMessage(recordAndGetHistory('info', successMsg));
         if(placedCoords){
             markShipAsPlaced(gameState.activeShip);
             gameState.activeShip = null;
@@ -60,7 +64,7 @@ export function attemptShipPlacement (row, col) {
         console.log(player.getBoard().grid);
     }catch (error){
         console.warn(error.message);
-        updateGameMessage(`${error.message}`);
+        updateGameMessage(recordAndGetHistory('info', `PLACEMENT FAILED: ${error.message}`));
     }
 }
 
@@ -93,7 +97,6 @@ function executeRandomPlacement(player, updateUi = false) {
     }
 }
 
-//Used for the placeRandomFleet BTN
 export function randomizeHumanFleet () {
     resetPlayerBoard()
     const player = getCurrentPlayer()
@@ -102,7 +105,6 @@ export function randomizeHumanFleet () {
     if(isPlacementCompleted(player)) enableConfirmBtn();
 };
 
-//Used as a random fleet placement for the CPU
 export function randomizeComputerFleet () {
     const player = getCurrentPlayer()
     executeRandomPlacement(player);

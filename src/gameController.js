@@ -1,10 +1,11 @@
-import { startDialog, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard, showHumanShips, createLobby, createSecondPlayerGroup, removeSecondPlayerGroup, updateDirectionButtons } from "./ui.js";
+import { startDialog, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard, showHumanShips, createLobby, createSecondPlayerGroup, removeSecondPlayerGroup, updateDirectionButtons, } from "./ui.js";
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener, setUpModeToggle, attachValidationListener } from "./events.js";
 import { createPlayers,} from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
 import { gameState, getBoards, getCurrentPlayer, opponentIndex, resetGameState } from "./gameState.js";
 import { delayActions } from "./utils.js";
 import { playSound } from "./soundManager.js";
+import { recordAndGetHistory } from "./messenger.js";
 
 export function triggerPhase(phase) {
     gameState.gamePhase = phase;
@@ -62,11 +63,9 @@ function manageLobbyInternals (e) {
             if(!document.getElementById("secondPlayerInput")) {
 
                 const playersSection = document.querySelector(".playersSection")
-                //document.getElementById("firstPlayerInput").placeholder = "Player 1 Name"
                 playersSection.append(createSecondPlayerGroup())
             }
         }else{
-            //document.getElementById("firstPlayerInput").placeholder = "Your callsign"
             removeSecondPlayerGroup()
         }
 }
@@ -104,10 +103,12 @@ function handlePlacementConfirmation() {
     if(gameState.settings.mode === "pvp"){
         if(gameState.currentPlayer === 0){
             gameState.currentPlayer = 1;
-            gameState.shipDirection = 'horizontal'
-            disableConfirmBtn()
+            gameState.shipDirection = 'horizontal' 
             clearPlacementComponents()
             initializePlacementUI()
+            const newConfirmBtn = document.getElementById("confirmPlacementBtn");
+            attachConfirmBtnListener(newConfirmBtn, handlePlacementConfirmation);
+            disableConfirmBtn()
         } else {
             triggerPhase("game");
         }
@@ -134,7 +135,11 @@ function enterGamePhase () {
     mountFleetStatusUi(gameState.players);
 
     gameState.currentPlayer = 0;
-    updateGameMessage(`Battle commenced! ${getCurrentPlayer().id}, take the first shot.`);
+
+    const startMsg = `Battle commenced! ${getCurrentPlayer().id}, take the first shot.`;
+    const history = recordAndGetHistory('info', startMsg);
+    updateGameMessage(history);
+
     if(gameState.settings.mode === 'pvc'){
         singlePlayerMatch();
         showHumanShips( )
@@ -158,11 +163,18 @@ export function handleBoardClick(targetEl) {
 
 export function initializePlacementUI () {
     const fleetContainer = document.getElementById("fleetPlacementControls");
-    fleetContainer.append(createShipPlacementUi(getCurrentPlayer().id, gameState.shipDirection));
+    fleetContainer.append(createShipPlacementUi(getCurrentPlayer().id));
     const fleetContainerSelector = document.querySelector(`.shipContainer[data-player-id = '${getCurrentPlayer().id}']`);
     buildShip(getCurrentPlayer().getBoard().shipDetailsForCreation, fleetContainerSelector);
     loadPlacementContainer();
-    updateGameMessage(`Welcome, Admiral ${getCurrentPlayer().id}. Deploy your fleet to the grid.`);     
+
+    const welcomeMsg = `Welcome, Admiral ${getCurrentPlayer().id}. Deploy your fleet to the grid.`;
+    const history = recordAndGetHistory('info', welcomeMsg);
+    updateGameMessage(history);
+
+
+    const nameDisplay = document.querySelector(".playerDisplayName");
+    if(nameDisplay) nameDisplay.innerText = getCurrentPlayer().id
 }
 
 export function fireActionBasedOnBtnTarget (targetBtnId) {
@@ -170,22 +182,26 @@ export function fireActionBasedOnBtnTarget (targetBtnId) {
 
     switch(targetBtnId) {
         case "horizBtn": 
-            changeShipDirection(); 
-            updateDirectionButtons(gameState.shipDirection);
-            updateGameMessage(`Rotation: ${gameState.shipDirection}.`)
+            if (gameState.shipDirection !== 'horizontal') {
+                changeShipDirection();
+                updateDirectionButtons('horizontal');
+                updateGameMessage(recordAndGetHistory('info', 'Rotation: Horizontal.'));
+            }
             break;
         case "vertBtn": 
-            changeShipDirection();
-            updateDirectionButtons(gameState.shipDirection); 
-            updateGameMessage(`Rotation: ${gameState.shipDirection}.`)
+            if (gameState.shipDirection !== 'vertical') {
+                changeShipDirection();
+                updateDirectionButtons('vertical');
+                updateGameMessage(recordAndGetHistory('info', 'Rotation: Vertical.'));
+            }
             break;        
         case "randomPlacementBtn": 
             randomizeHumanFleet(); 
-            updateGameMessage("Fleet deployed randomly!")
+            updateGameMessage(recordAndGetHistory('info', 'Fleet deployed randomly!'));
             break;
         case "resetBtn": 
             resetPlayerBoard(); 
-            updateGameMessage("Board cleared. Ready for new orders.");
+            updateGameMessage(recordAndGetHistory('info', 'Board cleared. Ready for new orders.'));
             break;
         
     }
@@ -207,7 +223,7 @@ function loadPlacementContainer () {
     const shipContainer = document.querySelector(".shipContainer");
     attachActiveShipEventListener(shipContainer, handleDragStart)
     attachDragStartListener(shipContainer, selectShip);
-    const playerBoard = document.querySelector(`.board[data-player-id = '${getCurrentPlayer().id}']`);
+    const playerBoard = document.querySelector(`.gridField[data-player-id = '${getCurrentPlayer().id}']`);
     attachBoardEventListener(playerBoard, handleBoardClick);
     attachDragOverEvent(playerBoard, handlePlacementHover);
     attachDragLeaveEvent(playerBoard, handleDragLeave)
@@ -218,7 +234,7 @@ function loadPlacementContainer () {
 
 function singlePlayerMatch () {
     const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
-    const computerBoard = document.querySelector(`.board[data-player-id = "${opponentPlayer.id}"]`);
+    const computerBoard = document.querySelector(`.gridField[data-player-id = "${opponentPlayer.id}"]`);
     attachBoardEventListener(computerBoard, handleBoardClick);
 }
 
@@ -229,7 +245,7 @@ function pvpMatch () {
 
 async function computerAttack () {
     const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
-    const humanBoard = document.querySelector(`.board[data-player-id = "${opponentPlayer.id}"]`)
+    const humanBoard = document.querySelector(`.gridField[data-player-id = "${opponentPlayer.id}"]`)
     const computerAttackCoords = getCurrentPlayer().getNextMove();
     console.log(computerAttackCoords)
 
@@ -245,15 +261,21 @@ async function computerAttack () {
         markCellAsHit(resultOfTheAttack, targetCell);
 
         if(resultOfTheAttack==='hit'){
-            updateGameMessage(`Boom! ${getCurrentPlayer().id} scored a hit!`);
+            const msg = `BOOM! ${getCurrentPlayer().id} scored a hit on our fleet!`;
+            updateGameMessage(recordAndGetHistory('hit', msg));
+
             getCurrentPlayer().addAdjacentCells(computerAttackCoords);
-             updateShipsHp(opponentPlayer, computerAttackCoords.row, computerAttackCoords.col)
+            updateShipsHp(opponentPlayer, computerAttackCoords.row, computerAttackCoords.col)
         }else if(resultOfTheAttack === 'miss'){
-            updateGameMessage(`Splash!${getCurrentPlayer().id} missed!`)
+            const msg = `SPLASH! ${getCurrentPlayer().id} missed the target.`;
+            updateGameMessage(recordAndGetHistory('miss', msg));
         }else if(resultOfTheAttack === 'sunk'){
-             updateGameMessage("DIRECT HIT! One of our ships has been sent to the bottom!");
-             getCurrentPlayer().clearTargetingQueue();
-             updateShipsHp(opponentPlayer, computerAttackCoords.row, computerAttackCoords.col)
+
+            const msg = "CRITICAL DAMAGE! ONE OF OUR SHIPS HAS BEEN SUNK!";
+            updateGameMessage(recordAndGetHistory('sunk', msg));
+
+            getCurrentPlayer().clearTargetingQueue();
+            updateShipsHp(opponentPlayer, computerAttackCoords.row, computerAttackCoords.col)
         }
 
     await delayActions(500)
@@ -263,7 +285,9 @@ async function computerAttack () {
         return
     }
     await delayActions(1000);
-    updateGameMessage(`It is now ${opponentPlayer.id}'s turn!`);
+    const turnMsg = `IT IS NOW ${opponentPlayer.id}'S TURN!`;
+    updateGameMessage(recordAndGetHistory('info', turnMsg));
+
     gameState.currentPlayer = opponentIndex(gameState.currentPlayer); 
 }
 
@@ -301,13 +325,11 @@ function processAttack(targetEl) {
     const row = parseInt(targetEl.dataset.row);
     const col = parseInt(targetEl.dataset.col);
 
-    //We check if we are already in the middle of an attack or not
     if(gameState.isProcessingTurn)return;
     gameState.isProcessingTurn = true;
 
-    //We check if the click happens on the wrong board(especially for pvp);
+    
     if(playerBoard.dataset.playerId === activePlayer.id){
-        console.log("wrong board clicked")//here to know what happens, alter will refactor
         gameState.isProcessingTurn = false;
         return
     }
@@ -319,7 +341,7 @@ async function handleCombatFlow(targetEl,currentPlayer , opponent, row, col) {
 
     const resultOfTheAttack = opponent.getBoard().receiveAttack([row,col]);
     if(resultOfTheAttack===null){
-        console.log("hit the same cell");
+        updateGameMessage(recordAndGetHistory('info', "Target coordinates already engaged."));
         gameState.isProcessingTurn = false;
         return
     }
@@ -330,12 +352,15 @@ async function handleCombatFlow(targetEl,currentPlayer , opponent, row, col) {
     markCellAsHit(resultOfTheAttack, targetEl);
 
     if(resultOfTheAttack==='hit'){
-        updateGameMessage(`Boom! ${currentPlayer.id} scored a hit!`)
+        const msg = `BOOM! ${currentPlayer.id} scored a hit!`;
+        updateGameMessage(recordAndGetHistory('hit', msg));
         updateShipsHp(opponent, row, col)
     }else if(resultOfTheAttack === 'miss') {
-        updateGameMessage(`Splash!${currentPlayer.id} missed!`)
+        const msg = `SPLASH! ${currentPlayer.id} missed!`;
+        updateGameMessage(recordAndGetHistory('miss', msg));
     }else if(resultOfTheAttack === "sunk"){
-        updateGameMessage(`BOOM! Admiral ${getCurrentPlayer().id} has sunk one of the opponent ships!`);
+        const msg = `DIRECT HIT! ADMIRAL ${currentPlayer.id} HAS SUNK AN ENEMY VESSEL!`;
+        updateGameMessage(recordAndGetHistory('sunk', msg));
         updateShipsHp(opponent, row, col)
     }
     
@@ -348,7 +373,8 @@ async function handleCombatFlow(targetEl,currentPlayer , opponent, row, col) {
 
     await delayActions(1000);
     gameState.currentPlayer = opponentIndex(gameState.currentPlayer);
-    updateGameMessage(`It is now ${getCurrentPlayer().id}'s turn!`);
+    const turnMsg = `IT IS NOW ${getCurrentPlayer().id}'S TURN!`;
+    updateGameMessage(recordAndGetHistory('info', turnMsg));
     
     if(gameState.settings.mode === "pvc"){
         await computerAttack()
