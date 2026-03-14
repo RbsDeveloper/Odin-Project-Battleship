@@ -8,8 +8,8 @@ export function attachFormEventListener (element, callback) {
 
 export function attachActiveShipEventListener (element, callback) {
     element.addEventListener("click", (event) => {
-        const targetEl = event.target;
-        if(targetEl.classList.contains("ship")){
+        const targetEl = event.target.closest(".ship");
+        if(targetEl && targetEl.classList.contains("ship")){
             console.log(event.target)
             callback(targetEl.id);
         }

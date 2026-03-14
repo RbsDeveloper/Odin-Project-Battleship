@@ -130,6 +130,11 @@ export function createPlayerBoardsArea  (boardsData) {
 
 export function renderPlacementScreen () {
     const mainContainer = createCompleteElement("main", [], "",);
+    const header = createCompleteElement("div", ["placementHeader"]);
+    const subtitle = createCompleteElement("h4", ["subtitle"], "naval command system");
+    const title = createCompleteElement("h2", ["lobbyTitle"], "Placement Phase");
+    header.append(subtitle, title)
+
     const messageContainer = renderMessageDisplay()
 
     const interactiveArea = createCompleteElement("div", ["interactiveContainer"], "", {id: "interactiveZone"})
@@ -137,7 +142,7 @@ export function renderPlacementScreen () {
     const fleetPlacementContainer = createCompleteElement("div", ["fleetContainer"], "", {id: "fleetPlacementControls"});
     const gridContainer = createCompleteElement("div", ["placementBoardContainer"], "", {id: "placementArea"})
     interactiveArea.append(fleetPlacementContainer, gridContainer);
-    mainContainer.append(messageContainer, interactiveArea);
+    mainContainer.append(header, messageContainer, interactiveArea);
 
     return mainContainer;
 }
