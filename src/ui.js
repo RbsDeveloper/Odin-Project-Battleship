@@ -121,9 +121,15 @@ export function renderGameScreen (players) {
 export function createPlayerBoardsArea  (boardsData) {
     const boardsDestination = document.getElementById("boardsArea");
     
-    boardsData.forEach(playerGrid => {
-        boardsDestination.append(renderGameboard(playerGrid));
-    });
+    // boardsData.forEach(playerGrid => {
+    //     boardsDestination.append(renderGameboard(playerGrid));
+    // });
+
+    const leftBoard =  renderGameboard(boardsData[0]);
+    const rightBoard = renderGameboard(boardsData[1]);
+    const statsPanel = renderGameStatsDisplay();
+
+    boardsDestination.append(leftBoard, statsPanel, rightBoard);
 }
 
 //creates placement scree
@@ -463,3 +469,44 @@ export function updateGameMessage (history) {
         msgContainer.append(entry);
     })
 }
+
+export function renderGameStatsDisplay () {
+    const container = createCompleteElement("div", ["battleStats"]);
+    const header = createCompleteElement("div", ["header"]);
+    const activeTurnLabel = createCompleteElement("p", ["sectionLabel"], "01 - active turn");
+    const activePlayerWrapper = createCompleteElement("div", ["playerWrapper"]);
+    const statusDot = createCompleteElement("span", ["statusDot"]);
+    const playerTag = createCompleteElement("p", ["playerTag"], "", {id:"gameStatsPlayerTag"});
+    const instruction = createCompleteElement("span", ["turnInstruction"]);
+    activePlayerWrapper.append(statusDot, playerTag);
+    header.append(activeTurnLabel, activePlayerWrapper, instruction);
+
+    const body = createCompleteElement("div", ["gameStatsBody"]);
+    const label = createCompleteElement("p", ["sectionLabel"], "02 - accuracy");
+    body.append(label);
+    gameState.players.forEach(p => body.append(createAccuracyRow(p)));
+    
+    container.append(header, body);
+
+    return container
+}  
+
+function createAccuracyRow (player) {
+    const playerStatRow = createCompleteElement("div", ["statRow"], "", {"data-player-id": `${player.id}`});
+    const rowHeader = createCompleteElement("div", ["accuracyHeader"]);
+    const name = createCompleteElement("span", ["accuracyName"]);
+    const shots = createCompleteElement("span", ["accuracyShots"]);
+    rowHeader.append(name,shots);
+    const bar = createCompleteElement("div", ["accuracyBar"]);
+    const fill = createCompleteElement("div", ["accuracyBarFill"]);
+    bar.append(fill);
+    const footer = createCompleteElement("div", ["accuracyFooter"]);
+    const hits = createCompleteElement("span", ["accuracyHits"]);
+    const misses = createCompleteElement("span", ["accuracyMisses"]);
+    const percent = createCompleteElement("span", ["accuracyPercent"]);
+    footer.append(hits, misses, percent);
+    playerStatRow.append(rowHeader, bar, footer);
+
+    return playerStatRow;
+}
+
