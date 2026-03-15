@@ -1,4 +1,4 @@
-import { startDialog, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, renderFleetStatus, updateShipCard, showHumanShips, createLobby, createSecondPlayerGroup, removeSecondPlayerGroup, updateDirectionButtons, } from "./ui.js";
+import { startDialog, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, updateShipCard, showHumanShips, createLobby, createSecondPlayerGroup, removeSecondPlayerGroup, renderFleetStatus, updateDirectionButtons, updateGameStatsHeader, updateGameStatsBody, } from "./ui.js";
 import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener, setUpModeToggle, attachValidationListener } from "./events.js";
 import { createPlayers,} from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
@@ -139,6 +139,7 @@ function enterGamePhase () {
     const startMsg = `Battle commenced! ${getCurrentPlayer().id}, take the first shot.`;
     const history = recordAndGetHistory('info', startMsg);
     updateGameMessage(history);
+    updateGameStatsHeader(gameState.players[gameState.currentPlayer]);
 
     if(gameState.settings.mode === 'pvc'){
         singlePlayerMatch();
@@ -261,22 +262,23 @@ async function computerAttack () {
         markCellAsHit(resultOfTheAttack, targetCell);
 
         if(resultOfTheAttack==='hit'){
+            gameState.players[gameState.currentPlayer].hits++
             const msg = `BOOM! ${getCurrentPlayer().id} scored a hit on our fleet!`;
             updateGameMessage(recordAndGetHistory('hit', msg));
-
             getCurrentPlayer().addAdjacentCells(computerAttackCoords);
             updateShipsHp(opponentPlayer, computerAttackCoords.row, computerAttackCoords.col)
         }else if(resultOfTheAttack === 'miss'){
+            gameState.players[gameState.currentPlayer].misses++
             const msg = `SPLASH! ${getCurrentPlayer().id} missed the target.`;
             updateGameMessage(recordAndGetHistory('miss', msg));
         }else if(resultOfTheAttack === 'sunk'){
-
+            gameState.players[gameState.currentPlayer].hits++
             const msg = "CRITICAL DAMAGE! ONE OF OUR SHIPS HAS BEEN SUNK!";
             updateGameMessage(recordAndGetHistory('sunk', msg));
-
             getCurrentPlayer().clearTargetingQueue();
             updateShipsHp(opponentPlayer, computerAttackCoords.row, computerAttackCoords.col)
         }
+        updateGameStatsBody(gameState.players[gameState.currentPlayer], resultOfTheAttack)
 
     await delayActions(500)
     if(checkLoss(opponentPlayer)){
@@ -287,8 +289,10 @@ async function computerAttack () {
     await delayActions(1000);
     const turnMsg = `IT IS NOW ${opponentPlayer.id}'S TURN!`;
     updateGameMessage(recordAndGetHistory('info', turnMsg));
+    
 
-    gameState.currentPlayer = opponentIndex(gameState.currentPlayer); 
+    gameState.currentPlayer = opponentIndex(gameState.currentPlayer);
+    updateGameStatsHeader(gameState.players[gameState.currentPlayer]) 
 }
 
 function checkLoss (playerToCheck) {
@@ -352,17 +356,21 @@ async function handleCombatFlow(targetEl,currentPlayer , opponent, row, col) {
     markCellAsHit(resultOfTheAttack, targetEl);
 
     if(resultOfTheAttack==='hit'){
+        currentPlayer.hits++
         const msg = `BOOM! ${currentPlayer.id} scored a hit!`;
         updateGameMessage(recordAndGetHistory('hit', msg));
         updateShipsHp(opponent, row, col)
     }else if(resultOfTheAttack === 'miss') {
+        currentPlayer.misses++
         const msg = `SPLASH! ${currentPlayer.id} missed!`;
         updateGameMessage(recordAndGetHistory('miss', msg));
     }else if(resultOfTheAttack === "sunk"){
+        currentPlayer.hits++
         const msg = `DIRECT HIT! ADMIRAL ${currentPlayer.id} HAS SUNK AN ENEMY VESSEL!`;
         updateGameMessage(recordAndGetHistory('sunk', msg));
         updateShipsHp(opponent, row, col)
     }
+    updateGameStatsBody(currentPlayer, resultOfTheAttack)
     
     await delayActions(500)
     if(checkLoss(opponent)){
@@ -375,6 +383,7 @@ async function handleCombatFlow(targetEl,currentPlayer , opponent, row, col) {
     gameState.currentPlayer = opponentIndex(gameState.currentPlayer);
     const turnMsg = `IT IS NOW ${getCurrentPlayer().id}'S TURN!`;
     updateGameMessage(recordAndGetHistory('info', turnMsg));
+    updateGameStatsHeader(gameState.players[gameState.currentPlayer])
     
     if(gameState.settings.mode === "pvc"){
         await computerAttack()

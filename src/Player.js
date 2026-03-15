@@ -9,6 +9,15 @@ export function Player (type, id) {
         return gameboard
     }
 
+    const getTotalShots = () => {
+        return player.hits + player.misses;
+    }
+
+    const getAccuracy = () => {
+        const total = getTotalShots();
+        return total === 0 ? 0 : Math.round((player.hits / total)*100);
+    }
+
     const player =  {
         get type(){
             return type
@@ -17,6 +26,10 @@ export function Player (type, id) {
             return id
         }, 
         getBoard,
+        hits: 0,
+        misses: 0,
+        getTotalShots,
+        getAccuracy,
     }
 
     if(type === "computer"){

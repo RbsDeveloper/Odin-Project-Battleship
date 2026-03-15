@@ -501,12 +501,45 @@ function createAccuracyRow (player) {
     const fill = createCompleteElement("div", ["accuracyBarFill"]);
     bar.append(fill);
     const footer = createCompleteElement("div", ["accuracyFooter"]);
-    const hits = createCompleteElement("span", ["accuracyHits"]);
-    const misses = createCompleteElement("span", ["accuracyMisses"]);
-    const percent = createCompleteElement("span", ["accuracyPercent"]);
+    const hits = createCompleteElement("span", ["accuracyHits"], "0H");
+    const misses = createCompleteElement("span", ["accuracyMisses"], "0M");
+    const percent = createCompleteElement("span", ["accuracyPercent"], "0%");
     footer.append(hits, misses, percent);
     playerStatRow.append(rowHeader, bar, footer);
 
     return playerStatRow;
 }
 
+export function updateGameStatsHeader (player) {
+    const activePlayer = document.getElementById("gameStatsPlayerTag");
+    const playerWrapper = document.querySelector(".playerWrapper");
+
+    if(player.id === "computer"){
+        playerWrapper.classList.add("computer")
+    }else{
+        if(playerWrapper.classList.contains("computer")){
+            playerWrapper.classList.remove("computer")
+        }
+    }
+    activePlayer.textContent = `${player.id}`;
+}
+
+export function updateGameStatsBody (player, attackResult) {
+    const playerAccuracyRow = document.querySelector(`.statRow[data-player-id="${player.id}"]`);
+    const playerBarFill = playerAccuracyRow.querySelector(".accuracyBarFill");
+    const hitsSpan = playerAccuracyRow.querySelector(".accuracyHits")
+    const missesSpan = playerAccuracyRow.querySelector(".accuracyMisses")
+    const percentSpan = playerAccuracyRow.querySelector(".accuracyPercent")
+
+    if(attackResult === "hit" || attackResult === "sunk"){
+        hitsSpan.textContent = `${player.hits}H`
+        
+    }
+
+    if(attackResult === "miss"){
+        missesSpan.textContent = `${player.misses}M`
+    }
+    playerBarFill.style.width = `${player.getAccuracy()}%`
+    percentSpan.textContent = `${player.getAccuracy()}%`
+
+}
