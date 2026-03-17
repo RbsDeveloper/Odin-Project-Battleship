@@ -105,6 +105,11 @@ export function removeSecondPlayerGroup () {
 //FUNCTION THAT CREATES THE GAME SCREEN OR ARENA
 export function renderGameScreen (players) {
     const mainContainer = createCompleteElement("main", [], "",);
+    const header = createCompleteElement("div", ["gamePhaseHeader"]);
+    const gameTitle = createCompleteElement("h1", ["gameTitle"], "Battleship");
+    const subtitle = createCompleteElement("h4", ["subtitle"], "strategic naval combat")
+    header.append(gameTitle, subtitle);
+
     const messageContainer = renderMessageDisplay()
     const interactiveArea = createCompleteElement("div", ["interactiveContainer"], "", {id: "interactiveZone"})
 
@@ -113,7 +118,7 @@ export function renderGameScreen (players) {
     const rightFleetContainer = createCompleteElement("div", ["fleetContainer"],"", {id: "rightFleet", "data-player-id": `${players[1].id}`});
     
     interactiveArea.append(leftFleetContainer, middleContainer, rightFleetContainer);
-    mainContainer.append(messageContainer, interactiveArea);
+    mainContainer.append(header, messageContainer, interactiveArea);
     return mainContainer
 }
 
@@ -397,7 +402,7 @@ export function renderFleetStatus (owner, destination ) {
 function createShipCard (shipReference) {
     const card = createCompleteElement("div", ["shipCard"], "", {"data-ship-id": `${shipReference.id}`});
     const header = createCompleteElement("div", ["cardHeader"]);
-    const shipName = createCompleteElement("h4", ["shipName"], `${shipReference.id}`);
+    const shipName = createCompleteElement("p", ["shipName"], `${shipReference.id}`);
     const hpPoints = createCompleteElement("span", ["hpPoints"], `${shipReference.length}`);
     const shipContainer = createCompleteElement("div", ["shipHp"]);
     createHitPoints(shipReference.length, shipContainer);
@@ -477,7 +482,7 @@ export function renderGameStatsDisplay () {
     const activePlayerWrapper = createCompleteElement("div", ["playerWrapper"]);
     const statusDot = createCompleteElement("span", ["statusDot"]);
     const playerTag = createCompleteElement("p", ["playerTag"], "", {id:"gameStatsPlayerTag"});
-    const instruction = createCompleteElement("span", ["turnInstruction"]);
+    const instruction = createCompleteElement("span", ["turnInstruction"], "Select target on enemy grid");
     activePlayerWrapper.append(statusDot, playerTag);
     header.append(activeTurnLabel, activePlayerWrapper, instruction);
 
@@ -494,8 +499,8 @@ export function renderGameStatsDisplay () {
 function createAccuracyRow (player) {
     const playerStatRow = createCompleteElement("div", ["statRow"], "", {"data-player-id": `${player.id}`});
     const rowHeader = createCompleteElement("div", ["accuracyHeader"]);
-    const name = createCompleteElement("span", ["accuracyName"]);
-    const shots = createCompleteElement("span", ["accuracyShots"]);
+    const name = createCompleteElement("span", ["accuracyName"], `${[player.id]}`);
+    const shots = createCompleteElement("span", ["accuracyShots"], '0 shots');
     rowHeader.append(name,shots);
     const bar = createCompleteElement("div", ["accuracyBar"]);
     const fill = createCompleteElement("div", ["accuracyBarFill"]);
@@ -526,19 +531,20 @@ export function updateGameStatsHeader (player) {
 
 export function updateGameStatsBody (player, attackResult) {
     const playerAccuracyRow = document.querySelector(`.statRow[data-player-id="${player.id}"]`);
+    const shots = playerAccuracyRow.querySelector(".accuracyShots");
     const playerBarFill = playerAccuracyRow.querySelector(".accuracyBarFill");
     const hitsSpan = playerAccuracyRow.querySelector(".accuracyHits")
     const missesSpan = playerAccuracyRow.querySelector(".accuracyMisses")
     const percentSpan = playerAccuracyRow.querySelector(".accuracyPercent")
 
     if(attackResult === "hit" || attackResult === "sunk"){
-        hitsSpan.textContent = `${player.hits}H`
-        
+        hitsSpan.textContent = `${player.hits}H` 
     }
 
     if(attackResult === "miss"){
         missesSpan.textContent = `${player.misses}M`
     }
+    shots.textContent = `${player.getTotalShots()} shots`
     playerBarFill.style.width = `${player.getAccuracy()}%`
     percentSpan.textContent = `${player.getAccuracy()}%`
 
