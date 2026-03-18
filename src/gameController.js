@@ -131,7 +131,7 @@ function enterGamePhase () {
     console.log("Inside game phase")
     document.body.innerHTML = "";
     document.body.append(renderGameScreen(gameState.players));
-    createPlayerBoardsArea(getBoards());
+    createPlayerBoardsArea(getBoards(), gameState.players);
     mountFleetStatusUi(gameState.players);
 
     gameState.currentPlayer = 0;
@@ -143,7 +143,12 @@ function enterGamePhase () {
 
     if(gameState.settings.mode === 'pvc'){
         singlePlayerMatch();
-        showHumanShips( )
+
+        const player = gameState.players[0]
+        const humanGrid = player.getBoard().grid;
+        const boardEl = document.querySelector(`.gridField[data-player-id="${player.id}"]`)
+        if(!boardEl)return
+        showHumanShips(humanGrid, boardEl)
     }else{
         pvpMatch()
     }

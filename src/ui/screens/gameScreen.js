@@ -22,12 +22,12 @@ export function renderGameScreen (players) {
     return mainContainer
 }
 
-export function createPlayerBoardsArea  (boardsData) {
+export function createPlayerBoardsArea  (boardsData, currentplayers) {
     const boardsDestination = document.getElementById("boardsArea");
 
     const leftBoard =  renderGameboard(boardsData[0]);
     const rightBoard = renderGameboard(boardsData[1]);
-    const statsPanel = renderGameStatsDisplay();
+    const statsPanel = renderGameStatsDisplay(currentplayers);
 
     boardsDestination.append(leftBoard, statsPanel, rightBoard);
 }

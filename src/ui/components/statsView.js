@@ -1,7 +1,6 @@
 import {createCompleteElement} from "../uiUtils/domHelpers.js"
-import { gameState } from "../../gameState.js";
 
-export function renderGameStatsDisplay () {
+export function renderGameStatsDisplay (currentPlayers) {
     const container = createCompleteElement("div", ["battleStats"]);
     const header = createCompleteElement("div", ["header"]);
     const activeTurnLabel = createCompleteElement("p", ["sectionLabel"], "01 - active turn");
@@ -15,7 +14,7 @@ export function renderGameStatsDisplay () {
     const body = createCompleteElement("div", ["gameStatsBody"]);
     const label = createCompleteElement("p", ["sectionLabel"], "02 - accuracy");
     body.append(label);
-    gameState.players.forEach(p => body.append(createAccuracyRow(p)));
+    currentPlayers.forEach(p => body.append(createAccuracyRow(p)));
     
     container.append(header, body);
 

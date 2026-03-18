@@ -1,5 +1,4 @@
 import {createCompleteElement, createCells} from "../uiUtils/domHelpers.js"
-import { gameState } from "../../gameState.js";
 
 export function renderGameboard (player) {
     
@@ -27,17 +26,12 @@ export function markCellAsHit (attackResult, cell) {
     }
 }
 
-export function showHumanShips () {
-    const player = gameState.players[0]
-    const humanGrid = player.getBoard().grid;
-    const boardEl = document.querySelector(`.gridField[data-player-id="${player.id}"]`)
+export function showHumanShips (playerGrid, playerBoard) { 
 
-    if(!boardEl)return 
-
-    humanGrid.forEach((row, i) => {
+    playerGrid.forEach((row, i) => {
         row.forEach((cell, j) => {
             if(cell.hasShip){
-                const cellEl = document.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
+                const cellEl = playerBoard.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
                 if(cellEl) cellEl.classList.add("ship-placed")
             }
         })
