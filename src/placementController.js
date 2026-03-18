@@ -1,6 +1,6 @@
 import { gameState, getCurrentPlayer } from "./gameState.js";
 import { getRandomCoord, getRandomDirection } from "./utils.js";
-import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn, updateGameMessage, resetHighlightPlacement, highlightPlacement } from "./ui.js";
+import { toggleActiveClassOnShips, markCellsOccupied, markShipAsPlaced, resetBoardUi, resetFleetUi, enableConfirmBtn, disableConfirmBtn, updateGameMessage, resetHighlightPlacement, highlightPlacement } from "./ui/index.js";
 import { recordAndGetHistory } from "./messenger.js";
 
 export function selectShip (shipId) {

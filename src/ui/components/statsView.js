@@ -1,4 +1,5 @@
 import {createCompleteElement} from "../uiUtils/domHelpers.js"
+import { gameState } from "../../gameState.js";
 
 export function renderGameStatsDisplay () {
     const container = createCompleteElement("div", ["battleStats"]);

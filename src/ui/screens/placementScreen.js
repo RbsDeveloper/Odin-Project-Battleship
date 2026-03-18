@@ -1,5 +1,6 @@
 import {createCompleteElement} from "../uiUtils/domHelpers.js"
 import {renderMessageDisplay} from "../components/messageLogView.js"
+import { gameState } from "../../gameState.js";
 
 export function renderPlacementScreen () {
     const mainContainer = createCompleteElement("main", [], "",);

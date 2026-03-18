@@ -1,4 +1,5 @@
 import {createCompleteElement, createCells} from "../uiUtils/domHelpers.js"
+import { gameState } from "../../gameState.js";
 
 export function renderGameboard (player) {
     
