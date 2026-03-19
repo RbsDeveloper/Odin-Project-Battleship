@@ -253,7 +253,6 @@ async function computerAttack () {
     const opponentPlayer = gameState.players[opponentIndex(gameState.currentPlayer)];
     const humanBoard = document.querySelector(`.gridField[data-player-id = "${opponentPlayer.id}"]`)
     const computerAttackCoords = getCurrentPlayer().getNextMove();
-    console.log(computerAttackCoords)
 
     await delayActions(1000)
 

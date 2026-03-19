@@ -10,7 +10,6 @@ export function attachActiveShipEventListener (element, callback) {
     element.addEventListener("click", (event) => {
         const targetEl = event.target.closest(".ship");
         if(targetEl && targetEl.classList.contains("ship")){
-            console.log(event.target)
             callback(targetEl.id);
         }
     })
@@ -26,13 +25,9 @@ export function attachBoardEventListener (element, callback) {
 
 export function attachPlacementBtnsEventListener (element, callback) {
     element.addEventListener("click", (event) => {
-        console.log(event)
         const target = event.target;
         if(target.id){
-            console.log("it has an Id");
             callback(target.id);
-        }else{
-            console.log("No Id here");
         }
     })
 }
@@ -55,8 +50,6 @@ export function attachDragStartListener (element, callback) {
         const draggedElement = event.target
 
         if(draggedElement.classList.contains("ship")){
-            console.log('dragging')
-            console.log(draggedElement);
             callback(draggedElement.id)
         }
     })
