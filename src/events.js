@@ -1,4 +1,4 @@
-export function attachStartBtnLister (element, callback) {
+export function attachClickListener (element, callback) {
     element.addEventListener("click", callback)
 }
 
@@ -30,18 +30,6 @@ export function attachPlacementBtnsEventListener (element, callback) {
             callback(target.id);
         }
     })
-}
-
-export function attachConfirmBtnListener (element, callback) {
-    element.addEventListener("click", callback);
-}
-
-export function attachEventForNewGamebtn (element, callback) {
-    element.addEventListener("click", callback)
-}
-
-export function attachEventForPlayAgainBtn (element, callback) {
-    element.addEventListener("click", callback)
 }
 
 export function attachDragStartListener (element, callback) {

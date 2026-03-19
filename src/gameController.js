@@ -1,5 +1,5 @@
 import { startDialog, renderGameScreen, createPlayerBoardsArea, buildShip, createShipPlacementUi, renderPlacementScreen, renderGameboard, markCellAsHit, renderWinnerDialog, updateGameMessage, enableConfirmBtn, disableConfirmBtn, resetHighlightPlacement, clearPlacementComponents, clearWindow, updateShipCard, showHumanShips, createLobby, createSecondPlayerGroup, removeSecondPlayerGroup, renderFleetStatus, updateDirectionButtons, updateGameStatsHeader, updateGameStatsBody, } from "./ui/index.js";
-import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachStartBtnLister, attachEventForNewGamebtn, attachEventForPlayAgainBtn, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachConfirmBtnListener, setUpModeToggle, attachValidationListener } from "./events.js";
+import { attachActiveShipEventListener, attachBoardEventListener, attachFormEventListener, attachPlacementBtnsEventListener, attachDragOverEvent, attachDropEvent, attachDragLeaveEvent, attachDragStartListener, attachClickListener, setUpModeToggle, attachValidationListener } from "./events.js";
 import { createPlayers,} from "./playerSetup.js";
 import { randomizeHumanFleet, resetPlayerBoard, changeShipDirection, attemptShipPlacement, isPlacementCompleted, selectShip, handlePlacementHover, handlePlacementDrop, randomizeComputerFleet } from "./placementController.js";
 import { gameState, getBoards, getCurrentPlayer, opponentIndex, resetGameState } from "./gameState.js";
@@ -21,7 +21,7 @@ export function triggerPhase(phase) {
 export function initGame () {  
     triggerPhase("start");
     const startBtn = document.getElementById("sgBtn");
-    attachStartBtnLister(startBtn, handleStartClick);
+    attachClickListener(startBtn, handleStartClick);
 }
 
 function handleStartClick (event){
@@ -107,7 +107,7 @@ function handlePlacementConfirmation() {
             clearPlacementComponents()
             initializePlacementUI()
             const newConfirmBtn = document.getElementById("confirmPlacementBtn");
-            attachConfirmBtnListener(newConfirmBtn, handlePlacementConfirmation);
+            attachClickListener(newConfirmBtn, handlePlacementConfirmation);
             disableConfirmBtn()
         } else {
             triggerPhase("game");
@@ -124,7 +124,7 @@ function enterPlacementPhase () {
     document.body.append(renderPlacementScreen());
     initializePlacementUI()
     const confirmBtn = document.getElementById("confirmPlacementBtn");
-    attachConfirmBtnListener(confirmBtn, handlePlacementConfirmation)
+    attachClickListener(confirmBtn, handlePlacementConfirmation)
 }
 
 function enterGamePhase () {
@@ -322,8 +322,8 @@ function enterWinnerPhase () {
     const newGameBtn = document.getElementById("startNewGame");
     const playAgainBtn =  document.getElementById("restartSamePlayers");
 
-    attachEventForNewGamebtn(newGameBtn, handleNewGame);
-    attachEventForPlayAgainBtn(playAgainBtn, handlePlayAgain);
+    attachClickListener(newGameBtn, handleNewGame);
+    attachClickListener(playAgainBtn, handlePlayAgain);
 }
 
 function processAttack(targetEl) {

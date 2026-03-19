@@ -22,7 +22,7 @@ export function renderPlacementScreen () {
 }
 
 //creates the container where the ships and btn controlls are stored for placement
-export function createShipPlacementUi  (identityParam, gameMode, playerIdx) {
+export function createShipPlacementUi  (identityParam) {
 
     //SECTION 01: FLEET SELECTOR
     const placementContainer = createCompleteElement("div", ["placementContainer"]);
