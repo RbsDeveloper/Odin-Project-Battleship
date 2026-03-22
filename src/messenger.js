@@ -40,4 +40,8 @@ export function recordAndGetHistory(type, message) {
 
     if (msgHistory.length > 3) msgHistory.shift();
     return msgHistory;
+};
+
+export function resetMessageHistory() {
+    msgHistory.length = 0;
 }
