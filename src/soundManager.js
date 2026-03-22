@@ -1,8 +1,12 @@
+import cannonShot from '../assets/sounds/cannonShot.mp3';
+import waterHit from '../assets/sounds/waterHit.mp3';
+import shipHit from '../assets/sounds/shipHit.mp3';
+
 const sounds = {
-    fire: new Audio("/assets/sounds/cannonShot.mp3"),
-    miss: new Audio("/assets/sounds/waterHit.mp3"),
-    hit: new Audio("/assets/sounds/shipHit.mp3"),
-    sunk: new Audio("/assets/sounds/shipHit.mp3"),
+    fire: new Audio(cannonShot),
+    miss: new Audio(waterHit),
+    hit: new Audio(shipHit),
+    sunk: new Audio(shipHit),
 };
 
 Object.values(sounds).forEach(audio => {
