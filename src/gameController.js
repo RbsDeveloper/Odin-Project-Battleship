@@ -1,10 +1,7 @@
 import { gameState } from "./gameState.js";
-import { enterStartPhase, handleStartClick } from "./sessionController.js";
-import { enterSettingsPhase } from "./sessionController.js";
+import { enterStartPhase,enterSettingsPhase, handleStartClick } from "./sessionController.js";
 import { enterPlacementPhase } from "./placementController.js";
-import { enterGamePhase } from "./combatPhase.js";
-import { enterWinnerPhase } from "./combatPhase.js";
-import { attachClickListener,  } from "./events.js";
+import { enterGamePhase, enterWinnerPhase } from "./combatPhase.js";
 
 
 export function triggerPhase(phase) {
@@ -20,6 +17,4 @@ export function triggerPhase(phase) {
 
 export function initGame () {  
     triggerPhase("start");
-    const startBtn = document.getElementById("sgBtn");
-    attachClickListener(startBtn, handleStartClick);
 }

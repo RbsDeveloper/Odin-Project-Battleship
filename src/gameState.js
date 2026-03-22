@@ -1,6 +1,5 @@
 export const gameState = {
     players : [],
-    mode: null,
     gamePhase: null,
     currentPlayer: 0,
     settings: null,

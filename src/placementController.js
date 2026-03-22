@@ -101,7 +101,6 @@ function attemptShipPlacement (row, col) {
     }
     
     try{    
-        console.log(shipReference, gameState.shipDirection, [row, col])
         const placedCoords = player.getBoard().placeShip(shipReference, gameState.shipDirection, [row, col]);
         markCellsOccupied( player.id , placedCoords);
         const successMsg = `${shipReference.id.toUpperCase()} DEPLOYED AT [${row},${col}].`;
@@ -110,9 +109,7 @@ function attemptShipPlacement (row, col) {
             markShipAsPlaced(gameState.activeShip);
             gameState.activeShip = null;
         }
-        console.log(player.getBoard().grid);
     }catch (error){
-        console.warn(error.message);
         updateGameMessage(recordAndGetHistory('info', `PLACEMENT FAILED: ${error.message}`));
     }
 }

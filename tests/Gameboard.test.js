@@ -157,8 +157,6 @@ describe("Report wheather or not all ships have been sunk", () => {
         gameBoard.receiveAttack([6,2])
         gameBoard.receiveAttack([6,3])
 
-        console.log(gameBoard.fleet[0])
-
         expect(gameBoard.areAllShipSunk()).toBe(true);
     })
 })

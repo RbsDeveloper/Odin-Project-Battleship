@@ -2,12 +2,15 @@ import { startDialog, clearWindow, createLobby, createSecondPlayerGroup, removeS
 import { attachFormEventListener, setUpModeToggle, attachValidationListener } from "./events.js";
 import { gameState, resetGameState } from "./gameState.js";
 import { triggerPhase, initGame } from "./gameController.js";
-
+import { attachClickListener,  } from "./events.js";
+import { resetMessageHistory } from "./messenger.js";
 
 export function enterStartPhase () {
     document.body.append(startDialog())
     const modal = document.getElementById("startingWindow");
-    modal.show()
+    modal.show();
+    const startBtn = document.getElementById("sgBtn");
+    attachClickListener(startBtn, handleStartClick);
 }
 
 export function handleStartClick (event){
@@ -80,12 +83,14 @@ function handleSubmitClick (e) {
 }
 
 export function handleNewGame () {
+    resetMessageHistory()
     clearWindow();
     resetGameState(true)
     initGame()
 }
 
 export function handlePlayAgain () {
+    resetMessageHistory()
     clearWindow();
     resetGameState();
     triggerPhase("placement")

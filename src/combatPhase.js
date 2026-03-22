@@ -9,7 +9,6 @@ import { handleNewGame, handlePlayAgain } from "./sessionController.js";
 
 
 export function enterGamePhase () {
-    console.log("Inside game phase")
     document.body.innerHTML = "";
     document.body.append(renderGameScreen(gameState.players));
     createPlayerBoardsArea(getBoards(), gameState.players);
