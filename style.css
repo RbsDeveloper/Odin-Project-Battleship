@@ -180,7 +180,7 @@ main {
     transform: scale(0.96);
 }
 
-.lobbyTitle {
+.lobbyTitle, .endGameTitle {
     color: var(--text-main);
     text-transform: uppercase;
     letter-spacing: 0.2rem;
@@ -217,7 +217,7 @@ main {
   border-right: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);
 }
 
-.sectionLabel, .tacticalLabel {
+.sectionLabel, .tacticalLabel, .winnerMessage {
     color: var(--text-muted);
     font-size: .65rem;
     text-transform: uppercase;
@@ -627,7 +627,7 @@ input:focus {
     gap: 2rem;
 }
 
-.fleetContainer {
+.fleetContainer, .winnerDialog {
     border: 1px solid var(--bg-surface);
     border-radius: 0.250rem;
     padding: 1.2rem;
@@ -639,6 +639,29 @@ input:focus {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+}
+
+/* winner dialog style*/
+.winnerDialog {
+    background-color: var(--bg-main);
+    text-align: center;
+}
+
+#winnerDialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.endGameTitle {
+    margin-bottom: 1rem;
+}
+
+.winnerSpanId {
+    color: var(--miss);
+    font-size: .75rem;
+    padding: .5em;
+    margin-left: .5em;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    font-weight: bold;
 }
 
 .shipContainer {
@@ -753,12 +776,12 @@ input:focus {
     background: #334155;
 }
 
-.controlGroup {
+.controlGroup, .restartBtnsContainer {
     display: flex;
     gap: .5em;
 }
 
-.controlBtn, .actionBtn {
+.controlBtn, .actionBtn, .newGameBtn, .samePlayersRestart {
     flex: 1;
     display: flex;
     align-items: center;
@@ -778,7 +801,7 @@ input:focus {
     border-color: var(--text-muted);
 }
 
-.controlBtn.active{
+.controlBtn.active, .restartBtnsContainer > button:hover{
     border-color: rgba(59, 130, 246, 0.6);
     background: rgba(30, 58, 138, 0.3); 
     color: #93c5fd;
